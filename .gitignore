@@ -4,3 +4,12 @@
 *.jar
 *.war
 *.ear
+/DBoxInterface/nbproject/private/
+/DBoxServer/nbproject/private/
+/DBoxClient/nbproject/private/
+/DBoxInterface/build/
+/DBoxInterface/dist/
+/DBoxServer/build/
+/DBoxServer/dist/
+/DBoxClient/build/
+/DBoxClient/dist/
