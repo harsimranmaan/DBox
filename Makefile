@@ -9,10 +9,10 @@ clean:
 	rm DBoxServerUtils/dist -rf
 
 server: all
-	java -jar DBoxServer/dist/DBoxServer.jar
+	 cd  DBoxServer/dist && java -jar DBoxServer.jar
 
 client: all
-	java -jar DBoxClient/dist/DBoxClient.jar
+	cd  DBoxClient/dist && java -jar DBoxClient.jar
 
 broker: all
-	java -jar DBoxBroker/dist/DBoxBroker.jar
+	cd  DBoxBroker/dist && java -jar DBoxBroker.jar
