@@ -14,3 +14,5 @@
 /DBoxClient/build/
 /DBoxClient/dist/
 /DBoxBroker/nbproject/private/
+/DBoxServerInterface/nbproject/private/
+/DBoxServerUtils/nbproject/private/
