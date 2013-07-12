@@ -40,8 +40,8 @@ public class DBoxBroker
             // Bind the remote object in the registry
             int port = Integer.parseInt(context.getPropertyValue("port"));
             printMessage(String.valueOf(port));
+            Authenticator stub = (Authenticator) UnicastRemoteObject.exportObject(new Authenticator(), 0);
             Registry registry = LocateRegistry.createRegistry(port);
-            //Authenticator stub = (Authenticator) UnicastRemoteObject.exportObject(new Authenticator(),0);
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
             printMessage(IAuthentication.class.getSimpleName());
 
