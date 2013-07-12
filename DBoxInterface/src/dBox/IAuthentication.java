@@ -4,12 +4,15 @@
  */
 package dBox;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
 /**
  *
  * @author harsimran.maan
  */
-public interface IAuthentication
+public interface IAuthentication extends Remote
 {
 
-    boolean authenticate(String username, String password);
+    ClientDetails authenticate(String username, String password) throws RemoteException;
 }

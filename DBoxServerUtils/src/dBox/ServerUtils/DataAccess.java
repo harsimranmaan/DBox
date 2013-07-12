@@ -36,6 +36,7 @@ public class DataAccess
         connectionString = connection;
         username = user;
         password = pass;
+        Connect();
     }
 
     /**
