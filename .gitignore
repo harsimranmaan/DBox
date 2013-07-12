@@ -14,7 +14,11 @@
 /DBoxClient/build/
 /DBoxClient/dist/
 /DBoxBroker/nbproject/private/
-/DBoxServerInterface/nbproject/private/
-/DBoxServerUtils/nbproject/private/
 /DBoxBroker/build/
 /DBoxBroker/dist/
+/DBoxServerUtils/nbproject/private/
+/DBoxServerUtils/build/
+/DBoxServerUtils/dist/
+
+#Exceptions
+!/DBoxServerUtils/lib/*.jar
