@@ -6,7 +6,6 @@ package dBox.Client;
 
 import dBox.IAuthentication;
 import dBox.utils.ConfigManager;
-import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -29,7 +28,9 @@ public class DBoxClient
         try
         {
             ConfigManager context = ConfigManager.getInstance();
-            Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), Integer.parseInt(context.getPropertyValue("port")));
+            int port = Integer.parseInt(context.getPropertyValue("port"));
+            System.out.println(port);
+            Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), port);
             IAuthentication auth = (IAuthentication) registry.lookup(IAuthentication.class.getSimpleName());
             InteractionManager interact = new InteractionManager(auth);
             //Start

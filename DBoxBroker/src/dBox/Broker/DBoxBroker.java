@@ -34,12 +34,10 @@ public class DBoxBroker
         {
             ConfigManager context = ConfigManager.getInstance();
             // Bind the remote object in the registry
-            Registry registry = LocateRegistry.createRegistry(Integer.parseInt(context.getPropertyValue("port")));
+            int port = Integer.parseInt(context.getPropertyValue("port"));
+            printMessage(String.valueOf(port));
+            Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
-            printMessage(IAuthentication.class.getSimpleName());
-
-            registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
-
             printMessage(IAuthentication.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));

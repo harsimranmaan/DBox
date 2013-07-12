@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author harsimran.maan
  */
-class Authenticator extends UnicastRemoteObject implements IAuthentication, Serializable
+public class Authenticator extends UnicastRemoteObject implements IAuthentication, Serializable
 {
 
     private static final long serialVersionUID = 2222L;
