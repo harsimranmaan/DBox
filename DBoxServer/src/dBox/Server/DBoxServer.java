@@ -10,7 +10,7 @@ import dBox.IAuthentication;
  *
  * @author harsimran.maan
  */
-public class DBoxServer implements IAuthentication
+public class DBoxServer
 {
 
     /**
@@ -18,12 +18,6 @@ public class DBoxServer implements IAuthentication
      */
     public static void main(String[] args)
     {
-        System.out.println(new DBoxServer().authenticate("a", "b"));
-    }
-
-    @Override
-    public boolean authenticate(String username, String password)
-    {
-        return true; //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Server");
     }
 }

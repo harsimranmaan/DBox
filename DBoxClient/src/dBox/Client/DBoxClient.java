@@ -5,25 +5,40 @@
 package dBox.Client;
 
 import dBox.IAuthentication;
+import dBox.utils.ConfigManager;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author harsimran.maan
  */
-public class DBoxClient implements IAuthentication
+public class DBoxClient
 {
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args)
+    public static void main(String[] args) throws NotBoundException
     {
-        System.out.println(new DBoxClient().authenticate("a", "b"));
-    }
+        try
+        {
+            ConfigManager context = ConfigManager.getInstance();
+            Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), Integer.parseInt(context.getPropertyValue("port")));
+            IAuthentication auth = (IAuthentication) registry.lookup(IAuthentication.class.getSimpleName());
+            InteractionManager interact = new InteractionManager(auth);
+            //Start
+            interact.init();
+        }
+        catch (RemoteException ex)
+        {
+            Logger.getLogger(DBoxClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-    @Override
-    public boolean authenticate(String username, String password)
-    {
-        return false;
     }
 }

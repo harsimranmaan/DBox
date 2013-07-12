@@ -4,6 +4,8 @@
  */
 package dBox;
 
+import java.rmi.RemoteException;
+
 /**
  *
  * @author harsimran.maan
@@ -11,5 +13,5 @@ package dBox;
 public interface IAuthentication
 {
 
-    boolean authenticate(String username, String password);
+    ClientDetails authenticate(String username, String password) throws RemoteException;
 }
