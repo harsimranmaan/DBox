@@ -33,10 +33,12 @@ public class DBoxBroker
         try
         {
             ConfigManager context = ConfigManager.getInstance();
+            System.setProperty("java.rmi.server.hostname", context.getPropertyValue("self"));
             // Bind the remote object in the registry
             int port = Integer.parseInt(context.getPropertyValue("port"));
             printMessage(String.valueOf(port));
             Registry registry = LocateRegistry.createRegistry(port);
+
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
             printMessage(IAuthentication.class.getSimpleName());
 
