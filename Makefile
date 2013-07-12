@@ -1,5 +1,5 @@
 all:
-	cd DBoxClient && ant jar &&	cp ../DBoxInterface/dist/*.jar dist/ && mkdir dist/config && cp config.properties dist/config/ &&	cd ../DBoxServer &&	ant jar &&	cp ../DBoxInterface/dist/*.jar dist/ && mkdir dist/config && cp config.properties dist/config/ && cp ../DBoxServerUtils/dist/*.jar dist/ && cd ../DBoxBroker && ant jar && cp ../DBoxInterface/dist/*.jar dist/ && mkdir dist/config && cp config.properties dist/config/ && cp ../DBoxServerUtils/dist/*.jar dist/
+	cd DBoxClient && ant jar &&	cd ../DBoxServer &&	ant jar && cd ../DBoxBroker && ant jar
 
 clean:
 	rm DBoxClient/dist -rf

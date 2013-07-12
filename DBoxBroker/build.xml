@@ -10,6 +10,15 @@
 <project name="DBoxBroker" default="default" basedir=".">
     <description>Builds, tests, and runs the project DBoxBroker.</description>
     <import file="nbproject/build-impl.xml"/>
+	<target name="-post-jar">
+            <copy file="config.properties" flatten="true" todir="${dist.dir}" />
+			<copy todir="${dist.dir}" includeEmptyDirs="false">
+                <fileset dir="../DBoxInterface/dist"></fileset>
+            </copy>
+			<copy todir="${dist.dir}" includeEmptyDirs="false">
+                <fileset dir="../DBoxServerUtils/dist"></fileset>
+            </copy>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 
