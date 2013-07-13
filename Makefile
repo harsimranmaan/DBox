@@ -1,4 +1,4 @@
-all:
+all: 
 	cd DBoxClient && ant jar &&	cd ../DBoxServer &&	ant jar && cd ../DBoxBroker && ant jar
 
 clean:
@@ -8,11 +8,11 @@ clean:
 	rm DBoxBroker/dist -rf
 	rm DBoxServerUtils/dist -rf
 
-server: all
-	 cd  DBoxServer/dist && java -jar DBoxServer.jar
+server: 
+	cd DBoxServer &&	ant jar && cd dist && java -jar DBoxServer.jar
 
-client: all
-	cd  DBoxClient/dist && java -jar DBoxClient.jar
+client: 
+	cd DBoxClient && ant jar && cd dist && java -jar DBoxClient.jar
 
-broker: all
-	cd  DBoxBroker/dist && java -jar DBoxBroker.jar
+broker: 
+	cd DBoxBroker && ant jar && cd dist && java -jar DBoxBroker.jar
