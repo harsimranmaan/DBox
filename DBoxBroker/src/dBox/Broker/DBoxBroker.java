@@ -6,6 +6,7 @@ package dBox.Broker;
 
 import dBox.IAuthentication;
 import dBox.ServerUtils.DataAccess;
+import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -33,6 +34,11 @@ public class DBoxBroker
         try
         {
             ConfigManager context = ConfigManager.getInstance();
+            String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
+            String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
+            System.setProperty("java.rmi.server.hostname", ip);
+            System.setProperty("java.net.preferIPv4Stack", "true");
+            printMessage(server + " " + ip);
             // Bind the remote object in the registry
             int port = Integer.parseInt(context.getPropertyValue("port"));
             printMessage(String.valueOf(port));

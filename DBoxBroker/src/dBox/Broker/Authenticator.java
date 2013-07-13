@@ -40,6 +40,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         ClientDetails client;
         if (userName.matches("[a-zA-Z0-9]+") && password.matches("[a-zA-Z0-9]+"))
         {
+            System.out.println(userName);
             try
             {
                 ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where username = '" + userName + "' AND userpassword = '" + password + "'");
