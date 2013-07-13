@@ -6,11 +6,11 @@ package dBox.Broker;
 
 import dBox.IAuthentication;
 import dBox.ServerUtils.DataAccess;
+import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,13 +34,14 @@ public class DBoxBroker
         try
         {
             ConfigManager context = ConfigManager.getInstance();
-            String server = context.getPropertyValue("self");
-            System.setProperty("java.rmi.server.hostname", server);
-            printMessage(server);
+            String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("hostname"));
+            String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
+            System.setProperty("java.rmi.server.hostname", ip);
+            System.setProperty("java.net.preferIPv4Stack", "true");
+            printMessage(server + " " + ip);
             // Bind the remote object in the registry
             int port = Integer.parseInt(context.getPropertyValue("port"));
             printMessage(String.valueOf(port));
-            Authenticator stub = (Authenticator) UnicastRemoteObject.exportObject(new Authenticator(), 0);
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
             printMessage(IAuthentication.class.getSimpleName());
