@@ -33,6 +33,7 @@ public class DBoxBroker
     {
         ConfigManager context = ConfigManager.getInstance();
         System.setProperty("java.security.policy", context.getPropertyValue("security"));
+        System.setProperty("java.rmi.useLocalHostname", "false");
         if (System.getSecurityManager() == null)
         {
             System.setSecurityManager(new SecurityManager());
@@ -41,7 +42,7 @@ public class DBoxBroker
         {
             String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
             String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
-            System.setProperty("java.rmi.server.hostname", ip);
+            System.setProperty("java.rmi.server.hostname", server);
             System.setProperty("java.net.preferIPv4Stack", "true");
             printMessage(server + " " + ip);
             // Bind the remote object in the registry

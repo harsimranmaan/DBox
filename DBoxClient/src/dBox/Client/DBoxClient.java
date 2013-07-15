@@ -33,7 +33,6 @@ public class DBoxClient
         }
         try
         {
-
             int port = Integer.parseInt(context.getPropertyValue("port"));
             System.out.println(port);
             Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), port);
