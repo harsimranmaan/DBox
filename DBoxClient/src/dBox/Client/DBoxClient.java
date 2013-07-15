@@ -25,9 +25,15 @@ public class DBoxClient
      */
     public static void main(String[] args) throws NotBoundException
     {
+        ConfigManager context = ConfigManager.getInstance();
+        System.setProperty("java.security.policy", context.getPropertyValue("security"));
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new SecurityManager());
+        }
         try
         {
-            ConfigManager context = ConfigManager.getInstance();
+
             int port = Integer.parseInt(context.getPropertyValue("port"));
             System.out.println(port);
             Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), port);

@@ -31,9 +31,14 @@ public class DBoxBroker
      */
     public static void main(String[] args)
     {
+        ConfigManager context = ConfigManager.getInstance();
+        System.setProperty("java.security.policy", context.getPropertyValue("security"));
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new SecurityManager());
+        }
         try
         {
-            ConfigManager context = ConfigManager.getInstance();
             String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
             String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
             System.setProperty("java.rmi.server.hostname", ip);
