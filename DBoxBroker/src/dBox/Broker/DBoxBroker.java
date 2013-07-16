@@ -40,6 +40,7 @@ public class DBoxBroker
         try
         {
             String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
+//            String server = "localhost";
             String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
             System.setProperty("java.rmi.server.hostname", ip);
             System.setProperty("java.net.preferIPv4Stack", "true");

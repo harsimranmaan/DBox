@@ -6,6 +6,7 @@ package dBox.Client;
 
 import dBox.IAuthentication;
 import dBox.utils.ConfigManager;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -23,7 +24,7 @@ public class DBoxClient
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws NotBoundException
+    public static void main(String[] args) throws NotBoundException, IOException
     {
         ConfigManager context = ConfigManager.getInstance();
         System.setProperty("java.security.policy", context.getPropertyValue("security"));
@@ -37,6 +38,7 @@ public class DBoxClient
             int port = Integer.parseInt(context.getPropertyValue("port"));
             System.out.println(port);
             Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), port);
+            //           Registry registry = LocateRegistry.getRegistry("localhost", port);
             IAuthentication auth = (IAuthentication) registry.lookup(IAuthentication.class.getSimpleName());
             InteractionManager interact = new InteractionManager(auth);
             //Start

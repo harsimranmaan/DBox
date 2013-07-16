@@ -40,9 +40,13 @@ import java.util.*;
 /**
  * Example to watch a directory (or tree) for changes to files.
  */
-public class WatchDir
+public class WatchDir extends Thread
 {
 
+    public void run()
+    {
+        this.processEvents();
+    }
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private final boolean recursive;
@@ -107,11 +111,18 @@ public class WatchDir
         this.keys = new HashMap<WatchKey, Path>();
         this.recursive = recursive;
 
-        /*
-         * if (recursive) { System.out.format("Scanning %s ...\n", dir);
-         * registerAll(dir); System.out.println("Done."); } else {
-         * register(dir); }
-         */
+
+        if (recursive)
+        {
+            System.out.format("Scanning %s ...\n", dir);
+            registerAll(dir);
+            System.out.println("Done.");
+        }
+        else
+        {
+            register(dir);
+        }
+
         // enable trace after initial registration
         this.trace = true;
     }

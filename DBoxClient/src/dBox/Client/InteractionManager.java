@@ -6,6 +6,10 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
@@ -20,6 +24,7 @@ class InteractionManager
     private Scanner scanIn;
     private IAuthentication authentication;
     private ClientDetails client;
+    private WatchDir directoryWatch;
 
     /**
      * Prints the login message to console
@@ -99,7 +104,7 @@ class InteractionManager
      * <p/>
      * @throws RemoteException
      */
-    public void init() throws RemoteException
+    public void init() throws RemoteException, IOException
     {
 
         String command;
@@ -125,8 +130,31 @@ class InteractionManager
                         printPrompt();
                     }
                     break;
+                case "dir":
+                    if (commandString.length == 2)
+                    {
+
+                        File file = new File(commandString[1]);
+                        if (file.isDirectory())
+                        {
+                            System.out.println(" " + commandString[1]);
+                            Path dirpath = Paths.get(commandString[1]);
+                            // Instantiate the object
+                            directoryWatch = new WatchDir(dirpath, true);
+                            // Start reading the given path directory
+                            directoryWatch.start();
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Wrong input.");
+                        printPrompt();
+                    }
+                    break;
                 case "quit":
                     client = null;
+                    // Kill the thread
+                    directoryWatch.interrupt();
                     isExit = true;
                     break;
                 default:
@@ -153,22 +181,10 @@ class InteractionManager
         System.out.println("|                                              |");
         if (isLoggedIn())
         {
-            System.out.println("|              query <ticker name>             |");
-            System.out.println("| Eg.              query goog                  |");
+            System.out.println("|              dir <directory path>             |");
+            System.out.println("| Eg.              dir D:\\bla                  |");
             System.out.println("|                                              |");
-            {
-                System.out.println("|         buy  <ticker name> <quantity>        |");
-                System.out.println("| Eg.             buy  goog 10                 |");
-                System.out.println("|                                              |");
-                System.out.println("|         sell <ticker name> <quantity>        |");
-                System.out.println("| Eg.             sell  goog 10                |");
-                System.out.println("|                                              |");
-                System.out.println("|                    list                      |");
-            }
-            {
-                System.out.println("|         update  <ticker name> <price>       |");
-                System.out.println("| Eg.          update  goog 999.99            |");
-            }
+
             System.out.println("|                                              |");
             System.out.println("|                    quit                      |");
 
@@ -184,7 +200,7 @@ class InteractionManager
     private String getInput()
     {
         scanIn = new Scanner(System.in);
-        String input = scanIn.nextLine().trim().toLowerCase();
+        String input = scanIn.nextLine().trim();//.toLowerCase();
         return input;
     }
 
