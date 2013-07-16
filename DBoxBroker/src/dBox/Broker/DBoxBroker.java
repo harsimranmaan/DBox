@@ -40,16 +40,24 @@ public class DBoxBroker
         }
         try
         {
-            String server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
-//            String server = "localhost";
-            String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
+            boolean isDebug = "true".equals(context.getPropertyValue("debug"));
+            String server;
+            if (isDebug)
+            {
+                server = context.getPropertyValue("localserver");
+            }
+            else
+            {
+                server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
+            }
+            //String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
             System.setProperty("java.rmi.server.hostname", server);
             System.setProperty("java.net.preferIPv4Stack", "true");
-            printMessage(server + " " + ip);
+            printMessage(server);
             // Bind the remote object in the registry
-            int port = Integer.parseInt(context.getPropertyValue("port"));
-            printMessage(String.valueOf(port));
-            Registry registry = LocateRegistry.createRegistry(port);
+            String port = context.getPropertyValue("port");
+            printMessage(port);
+            Registry registry = LocateRegistry.createRegistry(Integer.parseInt(port));
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
             printMessage(IAuthentication.class.getSimpleName());
 

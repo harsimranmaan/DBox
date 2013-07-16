@@ -12,6 +12,7 @@
     <import file="nbproject/build-impl.xml"/>
 	<target name="-post-jar">
             <copy file="config.properties" flatten="true" todir="${dist.dir}" />
+			<copy file="security.policy" flatten="true" todir="${dist.dir}" />
 			<copy todir="${dist.dir}" includeEmptyDirs="false">
                 <fileset dir="../DBoxInterface/dist"></fileset>
             </copy>

@@ -154,7 +154,10 @@ class InteractionManager
                 case "quit":
                     client = null;
                     // Kill the thread
-                    directoryWatch.interrupt();
+                    if (directoryWatch != null)
+                    {
+                        directoryWatch.interrupt();
+                    }
                     isExit = true;
                     break;
                 default:

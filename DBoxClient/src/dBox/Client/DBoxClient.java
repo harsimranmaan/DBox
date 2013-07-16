@@ -34,10 +34,18 @@ public class DBoxClient
         }
         try
         {
+            boolean isDebug = "true".equals(context.getPropertyValue("debug"));
+            String server;
+            if (isDebug)
+            {
+                server = context.getPropertyValue("localserver");
+            }
+            else
+            {
+                server = context.getPropertyValue("server");
+            }
             int port = Integer.parseInt(context.getPropertyValue("port"));
-            System.out.println(port);
-            Registry registry = LocateRegistry.getRegistry(context.getPropertyValue("server"), port);
-            //           Registry registry = LocateRegistry.getRegistry("localhost", port);
+            Registry registry = LocateRegistry.getRegistry(server, port);
             IAuthentication auth = (IAuthentication) registry.lookup(IAuthentication.class.getSimpleName());
             InteractionManager interact = new InteractionManager(auth);
             //Start
