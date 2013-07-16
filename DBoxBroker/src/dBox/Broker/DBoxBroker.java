@@ -8,6 +8,7 @@ import dBox.IAuthentication;
 import dBox.ServerUtils.DataAccess;
 import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
+import dBox.utils.CustomLogger;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -21,17 +22,13 @@ import java.util.logging.Logger;
 public class DBoxBroker
 {
 
-    private static void printMessage(String simpleName)
-    {
-        System.out.println("Bound " + simpleName);
-    }
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args)
     {
         ConfigManager context = ConfigManager.getInstance();
+        CustomLogger.disableLogging(context.getPropertyValue("logging").equals("false"));
         System.setProperty("java.security.policy", context.getPropertyValue("security"));
         System.setProperty("java.rmi.useLocalHostname", "false");
         if (System.getSecurityManager() == null)
@@ -53,13 +50,12 @@ public class DBoxBroker
             //String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
             System.setProperty("java.rmi.server.hostname", server);
             System.setProperty("java.net.preferIPv4Stack", "true");
-            printMessage(server);
             // Bind the remote object in the registry
             String port = context.getPropertyValue("port");
-            printMessage(port);
+            CustomLogger.log("Starting server " + server + " on port " + port);
             Registry registry = LocateRegistry.createRegistry(Integer.parseInt(port));
             registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
-            printMessage(IAuthentication.class.getSimpleName());
+            CustomLogger.log("Bound " + IAuthentication.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
             System.out.println("Server started");

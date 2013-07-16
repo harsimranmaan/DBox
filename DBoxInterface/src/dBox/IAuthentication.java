@@ -15,4 +15,6 @@ public interface IAuthentication extends Remote
 {
 
     ClientDetails authenticate(String username, String password) throws RemoteException;
+
+    ClientDetails authenticate(String hash) throws RemoteException;
 }

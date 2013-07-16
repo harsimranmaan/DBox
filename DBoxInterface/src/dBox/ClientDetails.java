@@ -14,11 +14,13 @@ public class ClientDetails implements Serializable
 {
 
     private static final long serialVersionUID = 1111L;
+    private String username;
     private String userhash;
     private int quota;
 
-    public ClientDetails(String hash, int quota)
+    public ClientDetails(String username, String hash, int quota)
     {
+        this.username = username;
         this.userhash = hash;
         this.quota = quota;
     }
@@ -32,9 +34,17 @@ public class ClientDetails implements Serializable
     }
 
     /**
+     * @return the username
+     */
+    public String getUsername()
+    {
+        return username;
+    }
+
+    /**
      * @return the quota
      */
-    public double getQuota()
+    public int getQuota()
     {
         return quota;
     }

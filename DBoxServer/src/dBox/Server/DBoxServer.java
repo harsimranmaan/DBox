@@ -4,8 +4,6 @@
  */
 package dBox.Server;
 
-import dBox.IAuthentication;
-
 /**
  *
  * @author harsimran.maan

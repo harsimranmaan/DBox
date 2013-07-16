@@ -7,6 +7,7 @@ package dBox.Broker;
 import dBox.ClientDetails;
 import dBox.IAuthentication;
 import dBox.ServerUtils.DataAccess;
+import dBox.utils.CustomLogger;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
@@ -38,15 +39,16 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     public ClientDetails authenticate(String userName, String password) throws RemoteException
     {
         ClientDetails client;
+        CustomLogger.log("Auth user " + userName);
         if (userName.matches("[a-zA-Z0-9]+") && password.matches("[a-zA-Z0-9]+"))
         {
-            System.out.println(userName);
+
             try
             {
                 ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where username = '" + userName + "' AND userpassword = '" + password + "'");
                 if (set != null && set.next())
                 {
-                    client = new ClientDetails(set.getString("pairhash"), set.getInt("quota"));
+                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"));
                 }
                 else
                 {
@@ -63,6 +65,38 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         else
         {
             throw new RemoteException("Username should be aplhanumeric only.");
+        }
+    }
+
+    @Override
+    public ClientDetails authenticate(String hash) throws RemoteException
+    {
+        ClientDetails client;
+        CustomLogger.log("Auth hash " + hash);
+        if (hash.matches("[a-zA-Z0-9]+"))
+        {
+            try
+            {
+                ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where pairhash = '" + hash + "'");
+                if (set != null && set.next())
+                {
+                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"));
+                }
+                else
+                {
+                    throw new RemoteException("Not able to login. Please provide login credentials.");
+                }
+                return client;
+            }
+            catch (SQLException ex)
+            {
+                Logger.getLogger(Authenticator.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RemoteException("Something went wrong while fetching your details. Write to the admin about this issue.");
+            }
+        }
+        else
+        {
+            throw new RemoteException("Not able to login. Please provide login credentials.");
         }
     }
 }
