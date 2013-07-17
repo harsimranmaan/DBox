@@ -13,7 +13,7 @@ import java.io.*;
 /**
  * Class to represent a File object that can be sent and recreated on another
  * system Will actually do the creating for you
- *
+ * <p/>
  */
 public class FilePacket implements Serializable
 {
@@ -27,7 +27,7 @@ public class FilePacket implements Serializable
      * Make a file packet that represents a given filename
      * <p/>
      * @param name The filename this represents
-		*
+     * <p/>
      */
     public FilePacket(String name)
     {
@@ -38,7 +38,7 @@ public class FilePacket implements Serializable
      * Get the name associated with this file
      * <p/>
      * @return The name
-	 *
+     * <p/>
      */
     public String getName()
     {
@@ -47,7 +47,7 @@ public class FilePacket implements Serializable
 
     /**
      * Have the filepacket read iteself in from the file it represents in name
-	 *
+     * <p/>
      */
     public void readIn()
     {
@@ -55,7 +55,10 @@ public class FilePacket implements Serializable
         {
             File file = new File(name);
             data = new byte[(int) (file.length())];
-            (new FileInputStream(file)).read(data);
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(data);
+            fileInputStream.close();
+
         }
         catch (Exception e)
         {
@@ -68,7 +71,7 @@ public class FilePacket implements Serializable
      * location file will have same name and contents
      * <p/>
      * @param out The outputStream to write itself to
-	 *
+     * <p/>
      */
     public void writeTo(OutputStream out)
     {

@@ -6,13 +6,19 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
+import dBox.IFileReceiver;
+import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,13 +35,13 @@ class InteractionManager
     private ClientDetails client;
     private WatchDir directoryWatch;
     private ConfigManager config;
+    private IFileReceiver receiver;
 
     /**
      * Handles Interaction with the User
      * <p/>
-     * @param stockQuery
-     * @param auth
-     * @param isAdmin
+     * <
+     * p/>
      */
     public InteractionManager(IAuthentication auth, ConfigManager config)
     {
@@ -52,7 +58,7 @@ class InteractionManager
             if (!hash.equals("none"))
             {
                 client = auth.authenticate(hash);
-                //  postAuthentication(client);
+                postAuthentication(client);
                 String path = config.getPropertyValue("folder");
                 if (!path.equals("none"))
                 {
@@ -130,6 +136,25 @@ class InteractionManager
     {
         config.setPropertyValue("hash", client.getUserhash());
         config.setPropertyValue("user", client.getUsername());
+        try
+        {
+            ServerDetails serverDetails = authentication.getServerDetails();
+            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
+            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
+            receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+            receiver.setDirectory(client.getUserhash());
+        }
+        catch (RemoteException ex)
+        {
+            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (NotBoundException ex)
+        {
+            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
     }
 
     private boolean folderExists(String path)
@@ -145,7 +170,7 @@ class InteractionManager
             Path dirpath = Paths.get(path);
             stopFolderMonitor();
             // Instantiate the object
-            directoryWatch = new WatchDir(dirpath, true);
+            directoryWatch = new WatchDir(dirpath, true, config, receiver);
             // Start reading the given path directory
             directoryWatch.start();
             //write confog

@@ -32,7 +32,9 @@ public class ConfigManager
         properties = new Properties();
         try
         {
-            properties.load(new FileInputStream(new File("config.properties")));
+            FileInputStream fileInputStream = new FileInputStream(new File("config.properties"));
+            properties.load(fileInputStream);
+            fileInputStream.close();
         }
         catch (IOException ex)
         {
@@ -80,6 +82,7 @@ public class ConfigManager
             File file = new File("config.properties");
             OutputStream out = new FileOutputStream(file);
             properties.store(out, "Saved on " + new Date().toString());
+            out.close();
         }
         catch (Exception e)
         {

@@ -22,3 +22,5 @@
 
 #Exceptions
 !/DBoxServerUtils/lib/*.jar
+/GachaTest/nbproject/private/
+/GachaTest/build/

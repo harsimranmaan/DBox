@@ -4,6 +4,7 @@
  */
 package dBox;
 
+import java.nio.file.Path;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -32,5 +33,7 @@ public interface IFileReceiver extends Remote
      * @exception RemoteException if something bad happens
      * <p/>
      */
-    public void receiveFile(FilePacket packet) throws RemoteException;
+    public void receiveFile(String path, FilePacket packet) throws RemoteException;
+
+    public String pathSeperator() throws RemoteException;
 }

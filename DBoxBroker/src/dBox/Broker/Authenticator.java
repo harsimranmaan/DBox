@@ -6,6 +6,7 @@ package dBox.Broker;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
+import dBox.ServerDetails;
 import dBox.ServerUtils.DataAccess;
 import dBox.utils.CustomLogger;
 import java.io.Serializable;
@@ -98,5 +99,11 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         {
             throw new RemoteException("Not able to login. Please provide login credentials.");
         }
+    }
+
+    @Override
+    public ServerDetails getServerDetails() throws RemoteException
+    {
+        return new ServerDetails("localhost", 5004);
     }
 }

@@ -5,6 +5,7 @@
 package dBox.Client;
 
 import dBox.IAuthentication;
+import dBox.IFileReceiver;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
