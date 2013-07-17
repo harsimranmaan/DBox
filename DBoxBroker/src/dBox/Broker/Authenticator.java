@@ -10,6 +10,7 @@ import dBox.ServerDetails;
 import dBox.ServerUtils.DataAccess;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
+import dBox.utils.Hashing;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
@@ -47,7 +48,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
 
             try
             {
-                ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where username = '" + userName + "' AND userpassword = '" + password + "'");
+                ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where username = '" + userName + "' AND userpassword = '" + Hashing.encryptSHA(password) + "'");
                 if (set != null && set.next())
                 {
                     client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"));

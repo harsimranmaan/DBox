@@ -5,7 +5,6 @@
 package dBox.utils;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -53,17 +52,17 @@ public class Hashing
     /**
      * The function encrypts SHA to the input String password.
      * <p/>
-     * @param password the String password to be encrypted
+     * @param literal the String password to be encrypted
      * <p/>
      * @return the SHA encrypted String
      */
-    public static String encryptSHA(String password)
+    public static String encryptSHA(String literal)
     {
-        String hash = password;
+        String hash = literal;
         try
         {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(password.getBytes());
+            md.update(literal.getBytes());
             hash = getString(md.digest());
 
         }
@@ -95,4 +94,9 @@ public class Hashing
         }
         return hexString.toString();
     }
+//    public static void main(String[] args)
+//    {
+//        System.out.println(encryptSHA("maan"));
+//        System.out.println(encryptSHA("maan").substring(0, 10));;
+//    }
 }

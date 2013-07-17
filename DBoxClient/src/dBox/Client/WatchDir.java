@@ -177,8 +177,6 @@ public class WatchDir extends Thread
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
-
-
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE))
@@ -237,11 +235,5 @@ public class WatchDir extends Thread
                 }
             }
         }
-    }
-
-    static void usage()
-    {
-        System.err.println("usage: java WatchDir [-r] dir");
-        System.exit(-1);
     }
 }
