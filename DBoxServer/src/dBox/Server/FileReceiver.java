@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -36,12 +35,9 @@ public class FileReceiver extends UnicastRemoteObject implements IFileReceiver, 
     @Override
     public void setDirectory(String directory) throws RemoteException
     {
-        this.directory = ConfigManager.getInstance().getPropertyValue("rootPath") + File.separator + directory;
+        this.directory = System.getProperty("user.home") + File.separator + ConfigManager.getInstance().getPropertyValue("rootPath") + File.separator + directory;
         File theFile = new File(directory);
-//        if (!theFile.isDirectory())
-//        {
         theFile.mkdirs();
-        //  }
         CustomLogger.log("Directory path " + directory);
     }
 

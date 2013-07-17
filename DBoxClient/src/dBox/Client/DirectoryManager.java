@@ -5,7 +5,6 @@
 package dBox.Client;
 
 import dBox.FileDetail;
-import java.awt.RenderingHints.Key;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

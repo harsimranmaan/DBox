@@ -8,6 +8,7 @@ import dBox.ClientDetails;
 import dBox.IAuthentication;
 import dBox.ServerDetails;
 import dBox.ServerUtils.DataAccess;
+import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -104,6 +105,34 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     @Override
     public ServerDetails getServerDetails() throws RemoteException
     {
-        return new ServerDetails("localhost", 5004);
+        ConfigManager config = ConfigManager.getInstance();
+        String server = config.getPropertyValue("localserver");
+        int port = Integer.parseInt(config.getPropertyValue("serverPort"));
+        return getPrimaryServer(server, port);
+
+    }
+
+    private ServerDetails getPrimaryServer(String defaultServer, int port)
+    {
+        ServerDetails sDetails;
+        try
+        {
+            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails ORDER BY serverIndex LIMIT 1");
+            if (set != null && set.next())
+            {
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"));
+            }
+            else
+            {
+                sDetails = new ServerDetails(defaultServer, port);
+            }
+            return sDetails;
+        }
+        catch (SQLException ex)
+        {
+            Logger.getLogger(Authenticator.class.getName()).log(Level.SEVERE, null, ex);
+            sDetails = new ServerDetails(defaultServer, port);
+        }
+        return sDetails;
     }
 }

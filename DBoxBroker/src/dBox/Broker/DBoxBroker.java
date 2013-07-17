@@ -58,6 +58,7 @@ public class DBoxBroker
             CustomLogger.log("Bound " + IAuthentication.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
+            new FileServerMonitor().start();
             System.out.println("Broker started");
         }
         catch (RemoteException ex)
