@@ -18,6 +18,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,7 +163,7 @@ class InteractionManager
         return file.isDirectory();
     }
 
-    private void setUpDirectoryMonitor(String path)
+    private void setUpDirectoryMonitor(String path) throws ClassNotFoundException
     {
         try
         {
@@ -174,6 +175,14 @@ class InteractionManager
             directoryWatch.start();
             //write confog
             config.setPropertyValue("folder", path);
+
+            //This will give the path of all the files in the directory
+            //Iterator iter = directoryWatch.getAllFilePath().iterator();
+            //while (iter.hasNext())
+            //{
+            //    System.out.println(iter.next());
+            //}
+
 
         }
         catch (IOException ex)
@@ -236,6 +245,7 @@ class InteractionManager
                                 CustomLogger.log("Monitoring " + commandString[1]);
                                 config.setPropertyValue("folder", commandString[1]);
                                 setUpDirectoryMonitor(commandString[1]);
+
                             }
                         }
                         else

@@ -59,6 +59,7 @@ public class WatchDir extends Thread
     private ConfigManager config;
     private IFileReceiver receiver;
     private boolean trace = false;
+    private ArrayList<String> allFiles = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event)
@@ -72,6 +73,7 @@ public class WatchDir extends Thread
     private void register(Path dir) throws IOException
     {
         WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        allFiles.addAll(listofFile(dir.toString()));
         if (trace)
         {
             Path prev = keys.get(key);
@@ -235,5 +237,24 @@ public class WatchDir extends Thread
                 }
             }
         }
+    }
+
+    public ArrayList<String> listofFile(String path)
+    {
+
+        File folder = new File(path);
+        File[] filelist = folder.listFiles();
+        ArrayList<String> filepath = new ArrayList<>();
+        for (int i = 0; i < filelist.length; i++)
+        {
+            filepath.add(filelist[i].getPath());
+            //System.out.println("" + listOfFiles[i].getPath());
+        }
+        return (filepath);
+    }
+
+    public ArrayList<String> getAllFilePath()
+    {
+        return this.allFiles;
     }
 }

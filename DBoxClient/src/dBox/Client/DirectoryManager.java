@@ -22,58 +22,51 @@ public class DirectoryManager implements Serializable
 {
 
     private FileDetail file;
-    private File clientLog;
-    private HashMap<String, String> clientMap = new HashMap<>();
+    private File logFile;
+    private HashMap<String, String> writeMap = new HashMap<>();
+    private HashMap<String, String> readMap = new HashMap<>();
     private HashMap<String, String> serverMap = new HashMap<>();
     private HashMap<String, String> tempMap = new HashMap<>();
     private HashMap<String, String> conflict = new HashMap<>();
 
-    public DirectoryManager(String localDirPath) throws IOException, ClassNotFoundException
+    public DirectoryManager(String logFile) throws IOException, ClassNotFoundException
     {
-        initialize();
+        this.logFile = new File(logFile);
+        this.writeMap = null;
+
     }
 
-    public void initialize() throws IOException, ClassNotFoundException
+//            mergeHashes();
+//            tempMap.putAll(clientMap);
+    public boolean writeLog(File logFile, HashMap<String, String> map) throws IOException
     {
-        this.clientLog = new File("dblike.data");
-        if (!clientLog.exists())
-        {
-            writeClientLog();
-        }
-        else
-        {
-            mergeHashes();
-            tempMap.putAll(clientMap);
-            readClientLog();
-        }
-    }
-
-    public void writeClientLog() throws IOException
-    {
-        FileOutputStream fos = new FileOutputStream(clientLog);
+        writeMap.putAll(map);
+        FileOutputStream fos = new FileOutputStream(logFile);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         //anotherMap.putAll(map);
-        oos.writeObject(clientMap);
+        oos.writeObject(writeMap);
         oos.flush();
         oos.close();
+        return true;
     }
 
-    public void readClientLog() throws IOException, ClassNotFoundException
+    public HashMap<String, String> readLog(File logFile) throws IOException, ClassNotFoundException
     {
-        FileInputStream fis = new FileInputStream(clientLog);
+        FileInputStream fis = new FileInputStream(logFile);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        tempMap = (HashMap<String, String>) ois.readObject();
+        readMap = (HashMap<String, String>) ois.readObject();
         ois.close();
+        return readMap;
     }
 
-    public void mergeHashes()
+    public void mergeHashes(HashMap<String, String> map, HashMap<String, String> newMap)
     {
-        if (!tempMap.isEmpty())
+        if (!newMap.isEmpty())
         {
-            for (String filename : clientMap.keySet())
+            for (String filename : map.keySet())
             {
-                String compareHash = tempMap.get(filename);
-                if (compareHash != clientMap.get(filename))
+                String compareHash = newMap.get(filename);
+                if (!compareHash.equals(map.get(filename)))
                 {
                     conflict.put(filename, null);
                     //                    clientMap.put(filename, clientMap.get(filename));
