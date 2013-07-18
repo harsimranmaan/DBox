@@ -2,10 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dBox.Client;
+package dBox;
 
-import dBox.FilePacket;
-import dBox.IFileReceiver;
 import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
@@ -34,12 +32,12 @@ public class FileSender extends Thread
         this.sendFile();
     }
 
-    private void sendFile()
+    public void sendFile()
     {
         try
         {
             FilePacket packet = new FilePacket(clientFile.toString());
-            packet.readIn();
+            // packet.readIn();
             receiver.receiveFile(serverPath, packet);
         }
         catch (RemoteException ex)

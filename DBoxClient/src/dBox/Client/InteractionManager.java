@@ -6,19 +6,14 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
-import dBox.IFileReceiver;
 import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,9 +28,9 @@ class InteractionManager
     private Scanner scanIn;
     private IAuthentication authentication;
     private ClientDetails client;
-    private WatchDir directoryWatch;
+    private DirectoryManager directoryWatch;
     private ConfigManager config;
-    private IFileReceiver receiver;
+//    private IFileReceiver receiver;
 
     /**
      * Handles Interaction with the User
@@ -64,7 +59,7 @@ class InteractionManager
                 {
                     if (folderExists(path))
                     {
-                        setUpDirectoryMonitor(path);
+                        setUpDirectoryMonitor();
                     }
                 }
             }
@@ -141,17 +136,17 @@ class InteractionManager
             ServerDetails serverDetails = authentication.getServerDetails();
             CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
             Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
-            receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
-            receiver.setDirectory(client.getUserhash());
+            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+            //        receiver.setDirectory(client.getUserhash());
         }
         catch (RemoteException ex)
         {
             Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (NotBoundException ex)
-        {
-            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        catch (NotBoundException ex)
+//        {
+//            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
 
 
@@ -163,27 +158,14 @@ class InteractionManager
         return file.isDirectory();
     }
 
-    private void setUpDirectoryMonitor(String path) throws ClassNotFoundException
+    private void setUpDirectoryMonitor()
     {
         try
         {
-            Path dirpath = Paths.get(path);
             stopFolderMonitor();
-            // Instantiate the object
-            directoryWatch = new WatchDir(dirpath, true, config, receiver);
+            directoryWatch = new DirectoryManager(new ServerDetailsGetter(authentication), config);
             // Start reading the given path directory
             directoryWatch.start();
-            //write confog
-            config.setPropertyValue("folder", path);
-
-            //This will give the path of all the files in the directory
-            //Iterator iter = directoryWatch.getAllFilePath().iterator();
-            //while (iter.hasNext())
-            //{
-            //    System.out.println(iter.next());
-            //}
-
-
         }
         catch (IOException ex)
         {
@@ -196,7 +178,7 @@ class InteractionManager
         // Kill the thread
         if (directoryWatch != null)
         {
-            directoryWatch.interrupt();
+            directoryWatch.stopMonitor();
         }
     }
 
@@ -244,7 +226,7 @@ class InteractionManager
                             {
                                 CustomLogger.log("Monitoring " + commandString[1]);
                                 config.setPropertyValue("folder", commandString[1]);
-                                setUpDirectoryMonitor(commandString[1]);
+                                setUpDirectoryMonitor();
 
                             }
                         }

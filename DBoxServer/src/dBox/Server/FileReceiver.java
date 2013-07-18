@@ -9,12 +9,15 @@ import dBox.IFileReceiver;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,13 +55,14 @@ public class FileReceiver extends UnicastRemoteObject implements IFileReceiver, 
             theFile.mkdirs();
             pathOnServer += File.separator + path;
             OutputStream out = new FileOutputStream(pathOnServer);
-            packet.writeTo(out);
+            packet.copy(out);
             out.close();
         }
-        catch (IOException e)
+        catch (IOException ex)
         {
-            e.printStackTrace();
+            Logger.getLogger(FileReceiver.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     @Override

@@ -30,8 +30,6 @@
  */
 package dBox.Client;
 
-import dBox.IFileReceiver;
-import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.nio.file.*;
@@ -39,10 +37,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import static java.nio.file.LinkOption.*;
 import java.nio.file.attribute.*;
 import java.io.*;
-import java.rmi.RemoteException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -50,17 +45,14 @@ import java.util.logging.Logger;
 public class WatchDir extends Thread
 {
 
-    public void run()
-    {
-        this.processEvents();
-    }
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private final boolean recursive;
-    private ConfigManager config;
-    private IFileReceiver receiver;
+//    private ConfigManager config;
     private boolean trace = false;
     private HashMap<String, String> fileHash;
+    private HashMap<Path, String> fileEvent;
+    private Path basePath;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event)
@@ -71,25 +63,20 @@ public class WatchDir extends Thread
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchDir(Path dir, boolean recursive, ConfigManager config,
-            IFileReceiver receiver) throws IOException
+    WatchDir(Path dir, boolean recursive, HashMap<String, String> fileHash, HashMap<Path, String> fileEvent) throws IOException
     {
-        this.fileHash = new HashMap<>();
-        this.receiver = receiver;
-        this.config = config;
+        this.basePath = dir;
+        this.fileHash = fileHash;
+        this.fileEvent = fileEvent;
         this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey, Path>();
+        this.keys = new HashMap<>();
         this.recursive = recursive;
-
-        calculateFileHash(dir.toString());
-        CustomLogger.log(fileHash.toString());
-
         if (recursive)
         {
-            System.out.format("Scanning %s ...\n", dir);
+            CustomLogger.log("Scanning dir " + dir + " ...");
             registerAll(dir);
 
-            System.out.println("Done.");
+            CustomLogger.log("Done");
         }
         else
         {
@@ -165,7 +152,7 @@ public class WatchDir extends Thread
             Path dir = keys.get(key);
             if (dir == null)
             {
-                System.err.println("WatchKey not recognized!!");
+                CustomLogger.log("WatchKey not recognized!!");
                 continue;
             }
 
@@ -201,31 +188,23 @@ public class WatchDir extends Thread
                 }
                 // print out event
                 CustomLogger.log("Event " + event.kind().name() + " File " + name + " Path " + child);
-                String serverpath = child.toString().replace(config.getPropertyValue("folder") + File.separator, "");
-                try
-                {
-                    serverpath = serverpath.replace(File.separator, receiver.pathSeperator());
-                }
-                catch (RemoteException ex)
-                {
-                    Logger.getLogger(WatchDir.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                CustomLogger.log("Serverpath " + serverpath);
-                //config.getPropertyValue("hash");
-                if (kind == ENTRY_DELETE)
-                {
-                }
-                if (kind == ENTRY_CREATE)
-                {
-                    //toDO DEEP COPY
-                    if (!Files.isDirectory(child, NOFOLLOW_LINKS))
-                    {
-                        new FileSender(receiver, serverpath, child).start();
-                    }
-                }
-                if (kind == ENTRY_MODIFY)
-                {
-                }
+
+
+                fileEvent.put(child, kind.name());
+//                if (kind == ENTRY_DELETE)
+//                {
+//                }
+//                if (kind == ENTRY_CREATE)
+//                {
+//                    //toDO DEEP COPY
+//                    if (!Files.isDirectory(child, NOFOLLOW_LINKS))
+//                    {
+//                        new FileSender(receiver, serverpath, child).start();
+//                    }
+//                }
+//                if (kind == ENTRY_MODIFY)
+//                {
+//                }
             }
 
             // reset key and remove from set if directory no longer accessible
@@ -243,7 +222,7 @@ public class WatchDir extends Thread
         }
     }
 
-    public void calculateFileHash(String path)
+    private void calculateFileHash(String path)
     {
 
         File folder = new File(path);
@@ -260,17 +239,17 @@ public class WatchDir extends Thread
             }
             else
             {
-                getFileHash().put(filepath, Hashing.getSHAChecksum(filepath));
+                fileHash.put(filepath, Hashing.getSHAChecksum(filepath));
             }
         }
 
     }
 
-    /**
-     * @return the fileHash
-     */
-    public HashMap<String, String> getFileHash()
+    @Override
+    public void run()
     {
-        return fileHash;
+        calculateFileHash(basePath.toString());
+        CustomLogger.log(fileHash.toString());
+        this.processEvents();
     }
 }
