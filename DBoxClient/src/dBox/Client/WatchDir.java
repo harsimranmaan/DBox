@@ -33,6 +33,7 @@ package dBox.Client;
 import dBox.IFileReceiver;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
+import dBox.utils.Hashing;
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.nio.file.LinkOption.*;
@@ -59,7 +60,7 @@ public class WatchDir extends Thread
     private ConfigManager config;
     private IFileReceiver receiver;
     private boolean trace = false;
-    private ArrayList<String> allFiles = new ArrayList<>();
+    private HashMap<String, String> fileHash;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event)
@@ -68,12 +69,41 @@ public class WatchDir extends Thread
     }
 
     /**
+     * Creates a WatchService and registers the given directory
+     */
+    WatchDir(Path dir, boolean recursive, ConfigManager config,
+            IFileReceiver receiver) throws IOException
+    {
+        this.fileHash = new HashMap<>();
+        this.receiver = receiver;
+        this.config = config;
+        this.watcher = FileSystems.getDefault().newWatchService();
+        this.keys = new HashMap<WatchKey, Path>();
+        this.recursive = recursive;
+
+
+        if (recursive)
+        {
+            System.out.format("Scanning %s ...\n", dir);
+            registerAll(dir);
+            System.out.println("Done.");
+        }
+        else
+        {
+            register(dir);
+        }
+
+        // enable trace after initial registration
+        this.trace = true;
+    }
+
+    /**
      * Register the given directory with the WatchService
      */
     private void register(Path dir) throws IOException
     {
         WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        allFiles.addAll(listofFile(dir.toString()));
+        calculateFileHash(dir.toString());
         if (trace)
         {
             Path prev = keys.get(key);
@@ -109,34 +139,6 @@ public class WatchDir extends Thread
                 return FileVisitResult.CONTINUE;
             }
         });
-    }
-
-    /**
-     * Creates a WatchService and registers the given directory
-     */
-    WatchDir(Path dir, boolean recursive, ConfigManager config,
-            IFileReceiver receiver) throws IOException
-    {
-        this.receiver = receiver;
-        this.config = config;
-        this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey, Path>();
-        this.recursive = recursive;
-
-
-        if (recursive)
-        {
-            System.out.format("Scanning %s ...\n", dir);
-            registerAll(dir);
-            System.out.println("Done.");
-        }
-        else
-        {
-            register(dir);
-        }
-
-        // enable trace after initial registration
-        this.trace = true;
     }
 
     /**
@@ -239,22 +241,25 @@ public class WatchDir extends Thread
         }
     }
 
-    public ArrayList<String> listofFile(String path)
+    public void calculateFileHash(String path)
     {
 
         File folder = new File(path);
         File[] filelist = folder.listFiles();
-        ArrayList<String> filepath = new ArrayList<>();
+        String filepath;
         for (int i = 0; i < filelist.length; i++)
         {
-            filepath.add(filelist[i].getPath());
-            //System.out.println("" + listOfFiles[i].getPath());
+            filepath = filelist[i].getPath();
+            getFileHash().put(filepath, Hashing.getSHAChecksum(filepath));
         }
-        return (filepath);
+
     }
 
-    public ArrayList<String> getAllFilePath()
+    /**
+     * @return the fileHash
+     */
+    public HashMap<String, String> getFileHash()
     {
-        return this.allFiles;
+        return fileHash;
     }
 }

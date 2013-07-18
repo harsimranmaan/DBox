@@ -61,18 +61,15 @@ public class DirectoryManager implements Serializable
 
     public void mergeHashes(HashMap<String, String> map, HashMap<String, String> newMap)
     {
-        if (!newMap.isEmpty())
+        for (String filename : map.keySet())
         {
-            for (String filename : map.keySet())
+            String compareHash = newMap.get(filename);
+            if (!compareHash.equals(map.get(filename)))
             {
-                String compareHash = newMap.get(filename);
-                if (!compareHash.equals(map.get(filename)))
-                {
-                    conflict.put(filename, null);
-                    //                    clientMap.put(filename, clientMap.get(filename));
-                    //                    tempMap.remove(filename);
+                conflict.put(filename, null);
+                //                    clientMap.put(filename, clientMap.get(filename));
+                //                    tempMap.remove(filename);
 
-                }
             }
         }
     }

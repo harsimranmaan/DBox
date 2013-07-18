@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,14 +39,23 @@ public class Hashing
         return complete.digest();
     }
 
-    public static String getSHAChecksum(String filename) throws Exception
+    public static String getSHAChecksum(String filename)
     {
-        byte[] b = createChecksum(filename);
         String result = "";
-
-        for (int i = 0; i < b.length; i++)
+        try
         {
-            result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+            byte[] b = createChecksum(filename);
+
+
+            for (int i = 0; i < b.length; i++)
+            {
+                result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Logger.getLogger(Hashing.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
