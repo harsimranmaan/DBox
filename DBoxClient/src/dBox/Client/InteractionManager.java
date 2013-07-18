@@ -6,13 +6,22 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
+import dBox.IFileReceiver;
+import dBox.ServerDetails;
+import dBox.utils.ConfigManager;
+import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.List;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,6 +34,46 @@ class InteractionManager
     private IAuthentication authentication;
     private ClientDetails client;
     private WatchDir directoryWatch;
+    private ConfigManager config;
+    private IFileReceiver receiver;
+
+    /**
+     * Handles Interaction with the User
+     * <p/>
+     * <
+     * p/>
+     */
+    public InteractionManager(IAuthentication auth, ConfigManager config)
+    {
+        this.authentication = auth;
+        this.config = config;
+        System.out.println("------------------------------------------------------");
+        System.out.println("|             Welcome to DbLike                      |");
+        System.out.println("------------------------------------------------------");
+        System.out.println("");
+        //try authentication
+        try
+        {
+            String hash = config.getPropertyValue("hash");
+            if (!hash.equals("none"))
+            {
+                client = auth.authenticate(hash);
+                postAuthentication(client);
+                String path = config.getPropertyValue("folder");
+                if (!path.equals("none"))
+                {
+                    if (folderExists(path))
+                    {
+                        setUpDirectoryMonitor(path);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            CustomLogger.log(ex.getCause().getMessage());
+        }
+    }
 
     /**
      * Prints the login message to console
@@ -65,37 +114,89 @@ class InteractionManager
     }
 
     /**
-     * Handles Interation with the User
+     * Handles the user login
      * <p/>
-     * @param stockQuery
-     * @param auth
-     * @param isAdmin
+     * @param username
+     * @param password
      */
-    public InteractionManager(IAuthentication auth)
+    private void login(String username, String password)
     {
-        this.authentication = auth;
-        System.out.println("------------------------------------------------------");
-        System.out.println("|             Welcome to DbLike                      |");
-        System.out.println("------------------------------------------------------");
-        System.out.println("");
+        try
+        {
+            client = authentication.authenticate(username, password);
+            postAuthentication(client);
+        }
+        catch (Exception ex)
+        {
+            System.out.println(ex.getCause().getMessage());
+        }
     }
 
-    /**
-     * Handles the user command
-     * <p/>
-     * @param commandString <p/>
-     * @throws RemoteException
-     */
-    private void login(String[] commandString) throws RemoteException
+    private void postAuthentication(ClientDetails client)
     {
-        if (commandString.length == 3)
+        config.setPropertyValue("hash", client.getUserhash());
+        config.setPropertyValue("user", client.getUsername());
+        try
         {
-            client = authentication.authenticate(commandString[1], commandString[2]);
-            System.out.println(client.getUserhash());
+            ServerDetails serverDetails = authentication.getServerDetails();
+            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
+            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
+            receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+            receiver.setDirectory(client.getUserhash());
         }
-        else
+        catch (RemoteException ex)
         {
-            printWarning(commandString[0]);
+            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (NotBoundException ex)
+        {
+            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
+    }
+
+    private boolean folderExists(String path)
+    {
+        File file = new File(path);
+        return file.isDirectory();
+    }
+
+    private void setUpDirectoryMonitor(String path) throws ClassNotFoundException
+    {
+        try
+        {
+            Path dirpath = Paths.get(path);
+            stopFolderMonitor();
+            // Instantiate the object
+            directoryWatch = new WatchDir(dirpath, true, config, receiver);
+            // Start reading the given path directory
+            directoryWatch.start();
+            //write confog
+            config.setPropertyValue("folder", path);
+
+            //This will give the path of all the files in the directory
+            //Iterator iter = directoryWatch.getAllFilePath().iterator();
+            //while (iter.hasNext())
+            //{
+            //    System.out.println(iter.next());
+            //}
+
+
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void stopFolderMonitor()
+    {
+        // Kill the thread
+        if (directoryWatch != null)
+        {
+            directoryWatch.interrupt();
         }
     }
 
@@ -108,62 +209,65 @@ class InteractionManager
     {
 
         String command;
-        int quantity = 0;
         String[] commandString;
         boolean isExit = false;
-
         do
         {
-
             command = getInput();
             commandString = command.split(" ");
-            switch (commandString[0])
+            try
             {
-
-
-                case "user":
-                    login(commandString);
-                    break;
-                case "help":
-                    if (commandString.length == 1)
-                    {
-                        printPrompt();
-                    }
-                    break;
-                case "dir":
-                    if (commandString.length == 2)
-                    {
-
-                        File file = new File(commandString[1]);
-                        if (file.isDirectory())
+                switch (commandString[0])
+                {
+                    case "login":
+                        if (commandString.length == 3)
                         {
-                            System.out.println(" " + commandString[1]);
-                            Path dirpath = Paths.get(commandString[1]);
-                            // Instantiate the object
-                            directoryWatch = new WatchDir(dirpath, true);
-                            // Start reading the given path directory
-                            directoryWatch.start();
+                            login(commandString[1], commandString[2]);
                         }
-                    }
-                    else
-                    {
-                        System.out.println("Wrong input.");
-                        printPrompt();
-                    }
-                    break;
-                case "quit":
-                    client = null;
-                    // Kill the thread
-                    if (directoryWatch != null)
-                    {
-                        directoryWatch.interrupt();
-                    }
-                    isExit = true;
-                    break;
-                default:
-                    printWarning(commandString[0]);
+                        else
+                        {
+                            printWarning(commandString[0]);
+                        }
 
-                    break;
+                        break;
+                    case "help":
+                        if (commandString.length == 1)
+                        {
+                            printPrompt();
+                        }
+                        break;
+                    case "dir":
+                        if (commandString.length == 2)
+                        {
+                            String path = commandString[1];
+                            if (folderExists(path))
+                            {
+                                CustomLogger.log("Monitoring " + commandString[1]);
+                                config.setPropertyValue("folder", commandString[1]);
+                                setUpDirectoryMonitor(commandString[1]);
+
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("Wrong input.");
+                            printPrompt();
+                        }
+                        break;
+                    case "quit":
+                        client = null;
+                        stopFolderMonitor();
+                        isExit = true;
+                        break;
+                    default:
+                        printWarning(commandString[0]);
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.out.println(ex.getMessage());
             }
         }
         while (!isExit);
@@ -177,8 +281,8 @@ class InteractionManager
         System.out.println("-----------------------------------------------");
         System.out.println("|                   COMMANDS                   |");
         System.out.println("-----------------------------------------------");
-        System.out.println("|               user <user name>               |");
-        System.out.println("| Eg.           user johnsmith                 |");
+        System.out.println("|               login <user name> < pwd >      |");
+        System.out.println("| Eg.           login johnsmith  secret        |");
 
 
         System.out.println("|                                              |");
@@ -202,6 +306,12 @@ class InteractionManager
      */
     private String getInput()
     {
+        String prompt = "$ ";
+        if (client != null)
+        {
+            prompt = client.getUsername() + prompt;
+        }
+        System.out.print(prompt);
         scanIn = new Scanner(System.in);
         String input = scanIn.nextLine().trim();//.toLowerCase();
         return input;

@@ -30,12 +30,19 @@
  */
 package dBox.Client;
 
+import dBox.IFileReceiver;
+import dBox.utils.ConfigManager;
+import dBox.utils.CustomLogger;
+import dBox.utils.Hashing;
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.nio.file.LinkOption.*;
 import java.nio.file.attribute.*;
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -50,12 +57,47 @@ public class WatchDir extends Thread
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private final boolean recursive;
+    private ConfigManager config;
+    private IFileReceiver receiver;
     private boolean trace = false;
+    private HashMap<String, String> fileHash;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event)
     {
         return (WatchEvent<T>) event;
+    }
+
+    /**
+     * Creates a WatchService and registers the given directory
+     */
+    WatchDir(Path dir, boolean recursive, ConfigManager config,
+            IFileReceiver receiver) throws IOException
+    {
+        this.fileHash = new HashMap<>();
+        this.receiver = receiver;
+        this.config = config;
+        this.watcher = FileSystems.getDefault().newWatchService();
+        this.keys = new HashMap<WatchKey, Path>();
+        this.recursive = recursive;
+
+        calculateFileHash(dir.toString());
+        CustomLogger.log(fileHash.toString());
+
+        if (recursive)
+        {
+            System.out.format("Scanning %s ...\n", dir);
+            registerAll(dir);
+
+            System.out.println("Done.");
+        }
+        else
+        {
+            register(dir);
+        }
+
+        // enable trace after initial registration
+        this.trace = true;
     }
 
     /**
@@ -102,32 +144,6 @@ public class WatchDir extends Thread
     }
 
     /**
-     * Creates a WatchService and registers the given directory
-     */
-    WatchDir(Path dir, boolean recursive) throws IOException
-    {
-
-        this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey, Path>();
-        this.recursive = recursive;
-
-
-        if (recursive)
-        {
-            System.out.format("Scanning %s ...\n", dir);
-            registerAll(dir);
-            System.out.println("Done.");
-        }
-        else
-        {
-            register(dir);
-        }
-
-        // enable trace after initial registration
-        this.trace = true;
-    }
-
-    /**
      * Process all events for keys queued to the watcher
      */
     void processEvents()
@@ -167,10 +183,6 @@ public class WatchDir extends Thread
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
-
-                // print out event
-                System.out.format("%s: %s\n", event.kind().name(), child);
-
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE))
@@ -186,6 +198,33 @@ public class WatchDir extends Thread
                     {
                         // ignore to keep sample readbale
                     }
+                }
+                // print out event
+                CustomLogger.log("Event " + event.kind().name() + " File " + name + " Path " + child);
+                String serverpath = child.toString().replace(config.getPropertyValue("folder") + File.separator, "");
+                try
+                {
+                    serverpath = serverpath.replace(File.separator, receiver.pathSeperator());
+                }
+                catch (RemoteException ex)
+                {
+                    Logger.getLogger(WatchDir.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                CustomLogger.log("Serverpath " + serverpath);
+                //config.getPropertyValue("hash");
+                if (kind == ENTRY_DELETE)
+                {
+                }
+                if (kind == ENTRY_CREATE)
+                {
+                    //toDO DEEP COPY
+                    if (!Files.isDirectory(child, NOFOLLOW_LINKS))
+                    {
+                        new FileSender(receiver, serverpath, child).start();
+                    }
+                }
+                if (kind == ENTRY_MODIFY)
+                {
                 }
             }
 
@@ -204,20 +243,34 @@ public class WatchDir extends Thread
         }
     }
 
-    static void usage()
+    public void calculateFileHash(String path)
     {
-        System.err.println("usage: java WatchDir [-r] dir");
-        System.exit(-1);
+
+        File folder = new File(path);
+        File[] filelist = folder.listFiles();
+        String filepath;
+        for (int i = 0; i < filelist.length; i++)
+        {
+            filepath = filelist[i].getPath();
+
+            if (filelist[i].isDirectory())
+            {
+                calculateFileHash(filepath);
+
+            }
+            else
+            {
+                getFileHash().put(filepath, Hashing.getSHAChecksum(filepath));
+            }
+        }
+
     }
 
-    /*
-     * public static void main(String[] args) throws IOException { // parse
-     * arguments if (args.length == 0 || args.length > 2) { usage(); } boolean
-     * recursive = false; int dirArg = 0; if (args[0].equals("-r")) { if
-     * (args.length < 2) { usage(); } recursive = true; dirArg++; }
+    /**
+     * @return the fileHash
      */
-    // register directory and process its events
-//        Path dir = Paths.get(args[dirArg]);
-//        new WatchDir(dir, recursive).processEvents();
-    //  }
+    public HashMap<String, String> getFileHash()
+    {
+        return fileHash;
+    }
 }

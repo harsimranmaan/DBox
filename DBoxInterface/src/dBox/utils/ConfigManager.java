@@ -6,7 +6,10 @@ package dBox.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +32,9 @@ public class ConfigManager
         properties = new Properties();
         try
         {
-            properties.load(new FileInputStream(new File("config.properties")));
+            FileInputStream fileInputStream = new FileInputStream(new File("config.properties"));
+            properties.load(fileInputStream);
+            fileInputStream.close();
         }
         catch (IOException ex)
         {
@@ -67,5 +72,21 @@ public class ConfigManager
     public String getPropertyValue(String key)
     {
         return properties.getProperty(key);
+    }
+
+    public void setPropertyValue(String key, String value)
+    {
+        try
+        {
+            properties.setProperty(key, value);
+            File file = new File("config.properties");
+            OutputStream out = new FileOutputStream(file);
+            properties.store(out, "Saved on " + new Date().toString());
+            out.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }
