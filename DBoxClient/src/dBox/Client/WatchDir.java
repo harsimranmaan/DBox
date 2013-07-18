@@ -81,11 +81,14 @@ public class WatchDir extends Thread
         this.keys = new HashMap<WatchKey, Path>();
         this.recursive = recursive;
 
+        calculateFileHash(dir.toString());
+        CustomLogger.log(fileHash.toString());
 
         if (recursive)
         {
             System.out.format("Scanning %s ...\n", dir);
             registerAll(dir);
+
             System.out.println("Done.");
         }
         else
@@ -103,7 +106,6 @@ public class WatchDir extends Thread
     private void register(Path dir) throws IOException
     {
         WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        calculateFileHash(dir.toString());
         if (trace)
         {
             Path prev = keys.get(key);
@@ -250,7 +252,16 @@ public class WatchDir extends Thread
         for (int i = 0; i < filelist.length; i++)
         {
             filepath = filelist[i].getPath();
-            getFileHash().put(filepath, Hashing.getSHAChecksum(filepath));
+
+            if (filelist[i].isDirectory())
+            {
+                calculateFileHash(filepath);
+
+            }
+            else
+            {
+                getFileHash().put(filepath, Hashing.getSHAChecksum(filepath));
+            }
         }
 
     }
