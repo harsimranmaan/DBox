@@ -96,7 +96,6 @@ public class DirectoryManager extends Thread
                         {
                             case "ENTRY_DELETE":
                                 String oldHash = hashManager.getValue(path);
-                                System.out.println(oldHash);
                                 action = receiver.actionOnDelete(getServerPathFull(path), oldHash);
                                 System.out.println(action);
                                 switch (action)
@@ -185,12 +184,23 @@ public class DirectoryManager extends Thread
         }
     }
 
+    /**
+     * Downloads the file and returns its hash
+     * <p/>
+     * @param path
+     */
     private String downLoadFile(Path path)
     {
 
         return "hash";
     }
 
+    /**
+     * removes the path file
+     * <p/>
+     * @param path <p/>
+     * @throws IOException
+     */
     private void removeFile(Path path) throws IOException
     {
         FileDeleter.delete(path, this.folder);
@@ -223,9 +233,10 @@ public class DirectoryManager extends Thread
     }
 
     /**
-     *
+     * gets the server path
+     * <p/>
      * @param child <p/>
-     * @return
+     * @return server path string
      */
     private String getServerPath(Path child)
     {

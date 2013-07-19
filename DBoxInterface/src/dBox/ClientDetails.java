@@ -7,7 +7,8 @@ package dBox;
 import java.io.Serializable;
 
 /**
- *
+ * Client detail interface
+ * <p/>
  * @author harsimran.maan
  */
 public class ClientDetails implements Serializable

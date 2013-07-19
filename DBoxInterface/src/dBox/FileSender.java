@@ -10,7 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class represents the file object to send a file
+ * <p/>
  * @author harsimran.maan
  */
 public class FileSender extends Thread

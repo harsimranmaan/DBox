@@ -58,10 +58,8 @@ public interface IFileServer extends Remote
      * Tells what action to perform if a file on client is deleted
      * <p/>
      * @param path
-     * @param oldHash
-     * <p/>
-     * @return
-     * <p/>
+     * @param oldHash <p/>
+     * @return <p/>
      * @throws RemoteException
      */
     public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException;

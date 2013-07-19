@@ -10,7 +10,8 @@ import dBox.ServerDetails;
 import java.rmi.RemoteException;
 
 /**
- *
+ * gives the server detail to the client upon request
+ * <p/>
  * @author harsimran.maan
  */
 public class ServerDetailsGetter implements IServerDetailsGetter
@@ -18,11 +19,23 @@ public class ServerDetailsGetter implements IServerDetailsGetter
 
     private IAuthentication auth;
 
+    /**
+     * initiates authenticate to receive server detail
+     * <p/>
+     * @param auth
+     */
     public ServerDetailsGetter(IAuthentication auth)
     {
         this.auth = auth;
     }
 
+    /**
+     * gives server detail for the authentic user
+     * <p/>
+     * @return server details
+     * <p/>
+     * @throws Exception
+     */
     @Override
     public ServerDetails getServerDetails() throws Exception
     {

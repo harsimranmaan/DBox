@@ -247,6 +247,9 @@ public class WatchDir extends Thread
         }
     }
 
+    /**
+     * thread to start the event monitoring
+     */
     @Override
     public void run()
     {
