@@ -4,14 +4,15 @@
  */
 package dBox;
 
-import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,10 +27,12 @@ public class HashManager
     private File hashFile;
     private HashMap<String, String> lastKnownServerHashes;
     private HashMap<Path, String> fileEvent;
+    private String hashFilePath;
 
     public HashManager(Path filePath, HashMap<Path, String> fileEvent)
     {
-        this.hashFile = new File(filePath.toString());
+        this.hashFilePath = filePath.toString();
+        this.hashFile = new File(hashFilePath);
         this.fileEvent = fileEvent;
         lastKnownServerHashes = new HashMap<>();
         if (hashFile.exists())
@@ -47,6 +50,14 @@ public class HashManager
             lastKnownServerHashes = (HashMap<String, String>) ois.readObject();
             ois.close();
             fis.close();
+//            for (String key : lastKnownServerHashes.keySet())
+//            {
+//                Path path = Paths.get(key);
+//                if (!Files.exists(path))
+//                {
+//                    fileEvent.put(Paths.get(key), "ENTRY_DELETED");
+//                }
+//            }
         }
         catch (IOException ex)
         {
@@ -80,9 +91,28 @@ public class HashManager
         return clientHash.equals(lastKnownServerHashes.get(key.toString()));
     }
 
-    public void updateHash(String key, String hash)
+    public String getValue(Path key)
     {
-        lastKnownServerHashes.put(key, hash);
+        return (lastKnownServerHashes.get(key.toString()) != null) ? lastKnownServerHashes.get(key.toString()) : "";
+    }
+
+    public void updateHash(Path key, String hash)
+    {
+        lastKnownServerHashes.put(key.toString(), hash);
         writeHashes();
+    }
+
+    public void deleteHash(Path key)
+    {
+        lastKnownServerHashes.remove(key.toString());
+        writeHashes();
+    }
+
+    /**
+     * @return the hashFilePath
+     */
+    public String getHashFilePath()
+    {
+        return hashFilePath;
     }
 }

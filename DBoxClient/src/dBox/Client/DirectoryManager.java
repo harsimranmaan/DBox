@@ -4,6 +4,8 @@
  */
 package dBox.Client;
 
+import dBox.ClientAction;
+import dBox.FileDeleter;
 import dBox.FileSender;
 import dBox.HashManager;
 import dBox.IFileServer;
@@ -13,6 +15,7 @@ import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -82,52 +85,124 @@ public class DirectoryManager extends Thread
                 for (Path path : fileEvent.keySet())
                 {
                     receiver = getReceiver();
-                    switch (fileEvent.get(path))
+                    ClientAction action;
+                    if (path.toString().contains("~"))
                     {
-
-                        case "ENTRY_DELETE":
-                            if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
-                            {
-                            }
-                            else
-                            {
-                            }
-                            break;
-                        case "ENTRY_CREATE":
-                        case "ENTRY_MODIFY":
-                            if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
-                            {
-                                String fileHash = Hashing.getSHAChecksum(path.toString());
-                                if (!hashManager.hashMatches(path, fileHash))
+                        fileEvent.remove(path);
+                    }
+                    else
+                    {
+                        switch (fileEvent.get(path))
+                        {
+                            case "ENTRY_DELETE":
+                                String oldHash = hashManager.getValue(path);
+                                System.out.println(oldHash);
+                                action = receiver.actionOnDelete(getServerPathFull(path), oldHash);
+                                System.out.println(action);
+                                switch (action)
                                 {
-                                    new FileSender(receiver, getServerPath(path), path).sendFile();
-                                    CustomLogger.log("Uploaded " + path);
-                                    hashManager.updateHash(path.toString(), fileHash);
+                                    case DOWNLOAD:
+                                        hashManager.updateHash(path, downLoadFile(path));
+                                        CustomLogger.log("Downloaded " + path);
+                                        break;
+
+                                    case NOTHING:
+                                    default:
+                                        hashManager.deleteHash(path);
+                                        break;
                                 }
                                 fileEvent.remove(path);
-                            }
-                            break;
-                        default:
-                            CustomLogger.log("Corrupt event");
-                            break;
+                                break;
+                            case "ENTRY_CREATE":
+                            case "ENTRY_MODIFY":
+                                if (Files.exists(path) && Files.size(path) > 0)
+                                {
+                                    if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
+                                    {
+                                        String fileHash = Hashing.getSHAChecksum(path.toString());
+                                        action = receiver.actionOnModify(getServerPathFull(path), fileHash, hashManager.getValue(path));
+                                        try
+                                        {
+                                            switch (action)
+                                            {
+                                                case UPLOAD:
+                                                    upload(path);
+                                                    hashManager.updateHash(path, fileHash);
+                                                    CustomLogger.log("Uploaded " + path);
+                                                    break;
+                                                case DOWNLOAD:
+                                                    downLoadFile(path);
+                                                    hashManager.updateHash(path, fileHash);
+                                                    CustomLogger.log("Downloaded " + path);
+                                                    break;
+                                                case CONFLICT:
+                                                    resolveConflict(path);
+                                                    //Handle hash change
+                                                    CustomLogger.log("Conflict Detected " + path);
+                                                    break;
+                                                case DELETE:
+                                                    removeFile(path);
+                                                    CustomLogger.log("Deleted " + path);
+                                                    hashManager.deleteHash(path);
+                                                    break;
+                                                case NOTHING:
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                        catch (FileNotFoundException ex)
+                                        {
+                                            //File removed while in processing
+                                            fileEvent.put(path, "ENTRY_DELETE");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //just make it traceable
+                                        hashManager.updateHash(path, "0");
+                                    }
+                                    fileEvent.remove(path);
+                                }
+                                else
+                                {
+                                    fileEvent.put(path, "ENTRY_DELETE");
+                                }
+                                break;
+
+
+                            default:
+                                CustomLogger.log(fileEvent.get(path));
+                                break;
+                        }
                     }
                 }
                 Thread.sleep(10000);
             }
             catch (Exception ex)
             {
-                // CustomLogger.log(ex.getMessage());
+                CustomLogger.log(ex.getMessage());
             }
         }
     }
 
-    private void downLoadFile(Path path)
+    private String downLoadFile(Path path)
     {
+
+        return "hash";
     }
 
     private void removeFile(Path path) throws IOException
     {
-        Files.delete(path);
+        FileDeleter.delete(path, this.folder);
+    }
+
+    private void upload(Path path)
+    {
+        new FileSender(receiver, getServerPath(path), path).sendFile();
+    }
+
+    private void resolveConflict(Path path)
+    {
     }
 
     /**
@@ -154,6 +229,7 @@ public class DirectoryManager extends Thread
      */
     private String getServerPath(Path child)
     {
+        // String serverpath = getServerPathFull(child).replaceAll(child.getFileName() + "$", "");
         String serverpath = child.toString().replace(folder + File.separator, "").replaceAll(child.getFileName() + "$", "");
         try
         {
@@ -168,6 +244,28 @@ public class DirectoryManager extends Thread
         }
         CustomLogger.log("Serverpath - /" + serverpath);
         return serverpath;
+    }
+
+    /**
+     *
+     * @param child <p/>
+     * @return
+     */
+    private String getServerPathFull(Path child)
+    {
+        String serverpath = child.toString().replace(folder + File.separator, "");
+        try
+        {
+            serverpath = serverpath.replace(File.separator, receiver.pathSeperator());
+        }
+        catch (RemoteException ex)
+        {
+            Logger.getLogger(DirectoryManager.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        CustomLogger.log("Full server path " + serverpath);
+        return serverpath;
+
     }
 
     /**

@@ -171,12 +171,7 @@ public class WatchDir extends Thread
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
-                //ignore certain paths
-                if (ignorePath.contains(child))
-                {
-                    System.out.println("Ignored event " + child);
-                    continue;
-                }
+
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE))
@@ -197,8 +192,13 @@ public class WatchDir extends Thread
                 }
                 // print out event
                 CustomLogger.log("Event " + event.kind().name() + " File " + name + " Path " + child);
-                //Log the event for processing
-                fileEvent.put(child, kind.name());
+                //ignore certain paths
+                if (!ignorePath.contains(child))
+                {
+                    //Log the event for processing
+                    fileEvent.put(child, kind.name());
+                }
+
                 // reset key and remove from set if directory no longer accessible
                 boolean valid = key.reset();
                 if (!valid)

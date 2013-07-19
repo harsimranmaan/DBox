@@ -53,7 +53,7 @@ public class DBoxServer
             int port = Integer.parseInt(context.getPropertyValue("port"));
             CustomLogger.log("Starting server " + server + " on port " + port);
             Registry registry = LocateRegistry.createRegistry(port);
-            registry.rebind(IFileServer.class.getSimpleName(), new FileReceiver());
+            registry.rebind(IFileServer.class.getSimpleName(), new FileServer());
             CustomLogger.log("Bound " + IFileServer.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));

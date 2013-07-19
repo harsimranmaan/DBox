@@ -11,5 +11,5 @@ package dBox;
 public enum ClientAction
 {
 
-    DELETE, CONFLICT, NOTHING
+    DELETE, CONFLICT, NOTHING, DOWNLOAD, UPLOAD
 }

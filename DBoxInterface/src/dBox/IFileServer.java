@@ -4,10 +4,8 @@
  */
 package dBox;
 
-import java.nio.file.Path;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 
 /**
  *
@@ -46,11 +44,25 @@ public interface IFileServer extends Remote
     public String pathSeperator() throws RemoteException;
 
     /**
-     * Checks if the file or folder at a path has changed
+     * Tells what action to perform
      * <p/>
-     * @param path <p/>
+     * @param path
+     * @param fileHash
+     * @param oldHash  <p/>
      * @return <p/>
      * @throws RemoteException
      */
-    public ClientAction hasChanged(String path, HashMap<String, String> fileHashes) throws RemoteException;
+    public ClientAction actionOnModify(String path, String fileHash, String oldHash) throws RemoteException;
+
+    /**
+     * Tells what action to perform if a file on client is deleted
+     * <p/>
+     * @param path
+     * @param oldHash
+     * <p/>
+     * @return
+     * <p/>
+     * @throws RemoteException
+     */
+    public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException;
 }
