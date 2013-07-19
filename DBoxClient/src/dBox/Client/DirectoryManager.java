@@ -45,6 +45,14 @@ public class DirectoryManager extends Thread
     private ArrayList<Path> ignorePath;
     private HashManager hashManager;
 
+    /**
+     * instantiates the class property
+     * <p/>
+     * @param hash
+     * @param serverDetailsGetter
+     * @param config              <p/>
+     * @throws IOException
+     */
     public DirectoryManager(String hash, IServerDetailsGetter serverDetailsGetter, ConfigManager config) throws IOException
     {
         this.serverDetailsGetter = serverDetailsGetter;
@@ -62,6 +70,9 @@ public class DirectoryManager extends Thread
         keepProcessing = true;
     }
 
+    /**
+     * start monitoring the path directory
+     */
     private void startMonitor()
     {
         while (keepProcessing)
@@ -110,6 +121,9 @@ public class DirectoryManager extends Thread
         }
     }
 
+    /**
+     * stops monitoring the directory
+     */
     public void stopMonitor()
     {
 
@@ -124,6 +138,11 @@ public class DirectoryManager extends Thread
         startMonitor();
     }
 
+    /**
+     *
+     * @param child <p/>
+     * @return
+     */
     private String getServerPath(Path child)
     {
         String serverpath = child.toString().replace(folder + File.separator, "").replaceAll(child.getFileName() + "$", "");
@@ -139,6 +158,13 @@ public class DirectoryManager extends Thread
         return serverpath;
     }
 
+    /**
+     * receives the information about the server
+     * <p/>
+     * @return the IFilereciver object
+     * <p/>
+     * @throws Exception
+     */
     private IFileReceiver getReceiver() throws Exception
     {
         ServerDetails serverDetails = serverDetailsGetter.getServerDetails();

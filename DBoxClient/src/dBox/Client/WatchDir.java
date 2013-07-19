@@ -215,6 +215,11 @@ public class WatchDir extends Thread
         }
     }
 
+    /**
+     * Gets the path of all the files in directory/sub-directory path
+     * <p/>
+     * @param path
+     */
     private void touchAllFiles(Path path)
     {
 
