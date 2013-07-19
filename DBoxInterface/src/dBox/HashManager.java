@@ -25,10 +25,12 @@ public class HashManager
 
     private File hashFile;
     private HashMap<String, String> lastKnownServerHashes;
+    private HashMap<Path, String> fileEvent;
 
-    public HashManager(Path filePath)
+    public HashManager(Path filePath, HashMap<Path, String> fileEvent)
     {
         this.hashFile = new File(filePath.toString());
+        this.fileEvent = fileEvent;
         lastKnownServerHashes = new HashMap<>();
         if (hashFile.exists())
         {

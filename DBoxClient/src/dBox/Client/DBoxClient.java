@@ -5,7 +5,7 @@
 package dBox.Client;
 
 import dBox.IAuthentication;
-import dBox.IFileReceiver;
+import dBox.IFileServer;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.IOException;

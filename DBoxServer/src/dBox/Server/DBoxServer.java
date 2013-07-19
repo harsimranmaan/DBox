@@ -4,7 +4,7 @@
  */
 package dBox.Server;
 
-import dBox.IFileReceiver;
+import dBox.IFileServer;
 import dBox.ServerUtils.DataAccess;
 import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
@@ -53,8 +53,8 @@ public class DBoxServer
             int port = Integer.parseInt(context.getPropertyValue("port"));
             CustomLogger.log("Starting server " + server + " on port " + port);
             Registry registry = LocateRegistry.createRegistry(port);
-            registry.rebind(IFileReceiver.class.getSimpleName(), new FileReceiver());
-            CustomLogger.log("Bound " + IFileReceiver.class.getSimpleName());
+            registry.rebind(IFileServer.class.getSimpleName(), new FileReceiver());
+            CustomLogger.log("Bound " + IFileServer.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
             new AliveCheck(server, port).start();

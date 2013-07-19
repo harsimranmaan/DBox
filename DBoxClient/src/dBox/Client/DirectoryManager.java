@@ -6,7 +6,7 @@ package dBox.Client;
 
 import dBox.FileSender;
 import dBox.HashManager;
-import dBox.IFileReceiver;
+import dBox.IFileServer;
 import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
@@ -40,7 +40,7 @@ public class DirectoryManager extends Thread
     private WatchDir dirWatcher;
     private boolean keepProcessing;
     private Path folder;
-    private IFileReceiver receiver;
+    private IFileServer receiver;
     private String userHash;
     private ArrayList<Path> ignorePath;
     private HashManager hashManager;
@@ -57,7 +57,7 @@ public class DirectoryManager extends Thread
         ignorePath.add(hashFile);
 
         this.dirWatcher = new WatchDir(folder, true, fileCurrentHash, fileEvent, ignorePath);
-        this.hashManager = new HashManager(hashFile);
+        this.hashManager = new HashManager(hashFile, fileEvent);
 
         keepProcessing = true;
     }
@@ -73,16 +73,16 @@ public class DirectoryManager extends Thread
                     receiver = getReceiver();
                     switch (fileEvent.get(path))
                     {
-                        case "ENTRY_CREATE":
 
-                            if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
+                        case "ENTRY_DELETE":
+                            if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
                             {
-                                new FileSender(receiver, getServerPath(path), path).sendFile();
-                                fileEvent.remove(path);
+                            }
+                            else
+                            {
                             }
                             break;
-                        case "ENTRY_DELETE":
-                            break;
+                        case "ENTRY_CREATE":
                         case "ENTRY_MODIFY":
                             if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
                             {
@@ -110,6 +110,15 @@ public class DirectoryManager extends Thread
         }
     }
 
+    private void downLoadFile(Path path)
+    {
+    }
+
+    private void removeFile(Path path) throws IOException
+    {
+        Files.delete(path);
+    }
+
     public void stopMonitor()
     {
 
@@ -130,20 +139,24 @@ public class DirectoryManager extends Thread
         try
         {
             serverpath = serverpath.replace(File.separator, receiver.pathSeperator());
+
+
         }
         catch (RemoteException ex)
         {
-            Logger.getLogger(DirectoryManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DirectoryManager.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
         CustomLogger.log("Serverpath - /" + serverpath);
         return serverpath;
     }
 
-    private IFileReceiver getReceiver() throws Exception
+    private IFileServer getReceiver() throws Exception
     {
         ServerDetails serverDetails = serverDetailsGetter.getServerDetails();
         Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
-        receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+        receiver = (IFileServer) registry.lookup(IFileServer.class
+                .getSimpleName());
         receiver.setDirectory(userHash);
         return receiver;
     }

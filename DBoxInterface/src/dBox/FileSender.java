@@ -18,9 +18,9 @@ public class FileSender extends Thread
 
     private String serverPath;
     private Path clientFile;
-    private IFileReceiver receiver;
+    private IFileServer receiver;
 
-    public FileSender(IFileReceiver receiver, String serverPath, Path clientPath)
+    public FileSender(IFileServer receiver, String serverPath, Path clientPath)
     {
         this.serverPath = serverPath;
         this.clientFile = clientPath;

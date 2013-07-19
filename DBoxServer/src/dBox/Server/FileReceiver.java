@@ -4,8 +4,9 @@
  */
 package dBox.Server;
 
+import dBox.ClientAction;
 import dBox.FilePacket;
-import dBox.IFileReceiver;
+import dBox.IFileServer;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author harsimran.maan
  */
-public class FileReceiver extends UnicastRemoteObject implements IFileReceiver, Serializable
+public class FileReceiver extends UnicastRemoteObject implements IFileServer, Serializable
 {
 
     private static final long serialVersionUID = 22122L;
@@ -68,5 +70,22 @@ public class FileReceiver extends UnicastRemoteObject implements IFileReceiver, 
     public String pathSeperator() throws RemoteException
     {
         return File.separator;
+    }
+
+    @Override
+    public ClientAction hasChanged(String path, HashMap<String, String> fileHashes) throws RemoteException
+    {
+        File theFile = new File(path);
+        if (!theFile.exists())
+        {
+            return ClientAction.DELETE;
+        }
+//        else
+//        {
+//        if(theFile.isDirectory()){
+//
+//        }
+//        }
+        return ClientAction.NOTHING;
     }
 }

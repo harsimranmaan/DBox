@@ -7,12 +7,13 @@ package dBox;
 import java.nio.file.Path;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 /**
  *
  * @author harsimran.maan
  */
-public interface IFileReceiver extends Remote
+public interface IFileServer extends Remote
 {
 
     /**
@@ -35,5 +36,21 @@ public interface IFileReceiver extends Remote
      */
     public void receiveFile(String path, FilePacket packet) throws RemoteException;
 
+    /**
+     * Get the server path separator
+     * <p/>
+     * @return The string literal for path
+     * <p/>
+     * @throws RemoteException
+     */
     public String pathSeperator() throws RemoteException;
+
+    /**
+     * Checks if the file or folder at a path has changed
+     * <p/>
+     * @param path <p/>
+     * @return <p/>
+     * @throws RemoteException
+     */
+    public ClientAction hasChanged(String path, HashMap<String, String> fileHashes) throws RemoteException;
 }
