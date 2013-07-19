@@ -50,9 +50,10 @@ public class WatchDir extends Thread
     private final boolean recursive;
 //    private ConfigManager config;
     private boolean trace = false;
-    private HashMap<String, String> fileHash;
+//    private HashMap<Path, String> fileCurrentHash;
     private HashMap<Path, String> fileEvent;
     private Path basePath;
+    private ArrayList<Path> ignorePath;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event)
@@ -63,13 +64,14 @@ public class WatchDir extends Thread
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchDir(Path dir, boolean recursive, HashMap<String, String> fileHash, HashMap<Path, String> fileEvent) throws IOException
+    WatchDir(Path dir, boolean recursive, HashMap<Path, String> fileHash, HashMap<Path, String> fileEvent, ArrayList<Path> ignorePath) throws IOException
     {
         this.basePath = dir;
-        this.fileHash = fileHash;
+        //      this.fileCurrentHash = fileHash;
         this.fileEvent = fileEvent;
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<>();
+        this.ignorePath = ignorePath;
         this.recursive = recursive;
         if (recursive)
         {
@@ -137,7 +139,6 @@ public class WatchDir extends Thread
     {
         for (;;)
         {
-
             // wait for key to be signalled
             WatchKey key;
             try
@@ -160,7 +161,7 @@ public class WatchDir extends Thread
             {
                 WatchEvent.Kind kind = event.kind();
 
-                // TBD - provide example of how OVERFLOW event is handled
+                //ignore overflow
                 if (kind == OVERFLOW)
                 {
                     continue;
@@ -170,6 +171,12 @@ public class WatchDir extends Thread
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
                 Path child = dir.resolve(name);
+                //ignore certain paths
+                if (ignorePath.contains(child))
+                {
+                    System.out.println("Ignored event " + child);
+                    continue;
+                }
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE))
@@ -179,6 +186,8 @@ public class WatchDir extends Thread
                         if (Files.isDirectory(child, NOFOLLOW_LINKS))
                         {
                             registerAll(child);
+                            //Check if the new directory has any file for copy
+                            touchAllFiles(child);
                         }
                     }
                     catch (IOException x)
@@ -188,68 +197,56 @@ public class WatchDir extends Thread
                 }
                 // print out event
                 CustomLogger.log("Event " + event.kind().name() + " File " + name + " Path " + child);
-
-
+                //Log the event for processing
                 fileEvent.put(child, kind.name());
-//                if (kind == ENTRY_DELETE)
-//                {
-//                }
-//                if (kind == ENTRY_CREATE)
-//                {
-//                    //toDO DEEP COPY
-//                    if (!Files.isDirectory(child, NOFOLLOW_LINKS))
-//                    {
-//                        new FileSender(receiver, serverpath, child).start();
-//                    }
-//                }
-//                if (kind == ENTRY_MODIFY)
-//                {
-//                }
-            }
-
-            // reset key and remove from set if directory no longer accessible
-            boolean valid = key.reset();
-            if (!valid)
-            {
-                keys.remove(key);
-
-                // all directories are inaccessible
-                if (keys.isEmpty())
+                // reset key and remove from set if directory no longer accessible
+                boolean valid = key.reset();
+                if (!valid)
                 {
-                    break;
+                    keys.remove(key);
+
+                    // all directories are inaccessible
+                    if (keys.isEmpty())
+                    {
+                        break;
+                    }
                 }
             }
         }
     }
 
-    private void calculateFileHash(String path)
+    private void touchAllFiles(Path path)
     {
 
-        File folder = new File(path);
+        File folder = new File(path.toString());
         File[] filelist = folder.listFiles();
-        String filepath;
+        Path filepath;
         for (int i = 0; i < filelist.length; i++)
         {
-            filepath = filelist[i].getPath();
-
-            if (filelist[i].isDirectory())
+            filepath = filelist[i].toPath();
+            if (Files.isDirectory(filepath, NOFOLLOW_LINKS))
             {
-                calculateFileHash(filepath);
-
+                touchAllFiles(filepath);
             }
             else
             {
-                fileHash.put(filepath, Hashing.getSHAChecksum(filepath));
+
+                //ignore certain paths
+                if (ignorePath.contains(filepath))
+                {
+                    continue;
+                }
+                //Mark any offline changes
+                fileEvent.put(filepath, "ENTRY_MODIFY");
             }
         }
-
     }
 
     @Override
     public void run()
     {
-        calculateFileHash(basePath.toString());
-        CustomLogger.log(fileHash.toString());
+        touchAllFiles(basePath);
+        //       CustomLogger.log(fileCurrentHash.toString());
         this.processEvents();
     }
 }

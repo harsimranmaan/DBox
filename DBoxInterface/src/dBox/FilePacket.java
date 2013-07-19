@@ -21,9 +21,8 @@ public class FilePacket implements Serializable
 {
 
     // the file name I represent
-    private String name;
-    // the data in my file
-    //  private byte[] data;
+    private String path;
+    private String fileName;
 
     /**
      * Make a file packet that represents a given filename
@@ -31,9 +30,10 @@ public class FilePacket implements Serializable
      * @param name The filename this represents
      * <p/>
      */
-    public FilePacket(String name)
+    public FilePacket(String path, String fileName)
     {
-        this.name = name;
+        this.path = path;
+        this.fileName = fileName;
     }
 
     /**
@@ -44,7 +44,7 @@ public class FilePacket implements Serializable
      */
     public String getName()
     {
-        return name;
+        return fileName;
     }
 
     /**
@@ -55,7 +55,7 @@ public class FilePacket implements Serializable
     {
         try
         {
-            File file = new File(name);
+            File file = new File(path);
 
             FileInputStream fileInputStream = new FileInputStream(file);
             byte[] buffer = new byte[4096]; // To hold file contents

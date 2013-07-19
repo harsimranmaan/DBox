@@ -13,7 +13,6 @@ import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.io.Serializable;
 import java.rmi.RemoteException;
-
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.ResultSet;
 import java.sql.SQLException;

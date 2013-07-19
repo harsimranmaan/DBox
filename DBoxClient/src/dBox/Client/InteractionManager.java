@@ -163,7 +163,7 @@ class InteractionManager
         try
         {
             stopFolderMonitor();
-            directoryWatch = new DirectoryManager(new ServerDetailsGetter(authentication), config);
+            directoryWatch = new DirectoryManager(config.getPropertyValue("hash"), new ServerDetailsGetter(authentication), config);
             // Start reading the given path directory
             directoryWatch.start();
         }

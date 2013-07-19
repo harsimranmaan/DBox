@@ -36,8 +36,7 @@ public class FileSender extends Thread
     {
         try
         {
-            FilePacket packet = new FilePacket(clientFile.toString());
-            // packet.readIn();
+            FilePacket packet = new FilePacket(clientFile.toString(), clientFile.getFileName().toString());
             receiver.receiveFile(serverPath, packet);
         }
         catch (RemoteException ex)

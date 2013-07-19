@@ -47,7 +47,6 @@ public class DBoxBroker
             {
                 server = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("host"));
             }
-            //String ip = MetaData.get(context.getPropertyValue("meta") + context.getPropertyValue("ip"));
             System.setProperty("java.rmi.server.hostname", server);
             System.setProperty("java.net.preferIPv4Stack", "true");
             // Bind the remote object in the registry

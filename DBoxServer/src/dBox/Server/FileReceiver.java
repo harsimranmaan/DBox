@@ -9,7 +9,6 @@ import dBox.IFileReceiver;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,11 +48,11 @@ public class FileReceiver extends UnicastRemoteObject implements IFileReceiver, 
     {
         try
         {
-            String pathOnServer = directory;
+            String pathOnServer = directory + File.separator + path;;
             CustomLogger.log("Path on server " + pathOnServer);
             File theFile = new File(pathOnServer);
             theFile.mkdirs();
-            pathOnServer += File.separator + path;
+            pathOnServer += packet.getName();
             OutputStream out = new FileOutputStream(pathOnServer);
             packet.copy(out);
             out.close();

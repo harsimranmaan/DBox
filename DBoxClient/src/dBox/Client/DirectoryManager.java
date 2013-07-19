@@ -4,19 +4,16 @@
  */
 package dBox.Client;
 
-import dBox.FileDetail;
 import dBox.FileSender;
+import dBox.HashManager;
 import dBox.IFileReceiver;
 import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
+import dBox.utils.Hashing;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -24,6 +21,7 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,29 +34,30 @@ public class DirectoryManager extends Thread
 {
 
     private IServerDetailsGetter serverDetailsGetter;
-    private FileDetail file;
-    private File logFile;
-    private HashMap<String, String> writeMap = new HashMap<>();
-    private HashMap<String, String> readMap = new HashMap<>();
-    private HashMap<String, String> serverMap = new HashMap<>();
-    private HashMap<String, String> tempMap = new HashMap<>();
-    private HashMap<String, String> conflict = new HashMap<>();
-    private ConfigManager config;
-    private HashMap<String, String> fileHash;
+//    private ConfigManager config;
+    private HashMap<Path, String> fileCurrentHash;
     private HashMap<Path, String> fileEvent;
     private WatchDir dirWatcher;
     private boolean keepProcessing;
     private Path folder;
     private IFileReceiver receiver;
+    private String userHash;
+    private ArrayList<Path> ignorePath;
+    private HashManager hashManager;
 
-    public DirectoryManager(IServerDetailsGetter serverDetailsGetter, ConfigManager config) throws IOException
+    public DirectoryManager(String hash, IServerDetailsGetter serverDetailsGetter, ConfigManager config) throws IOException
     {
         this.serverDetailsGetter = serverDetailsGetter;
-        fileHash = new HashMap<>();
+        this.userHash = hash;
+        fileCurrentHash = new HashMap<>();
         fileEvent = new HashMap<>();
+        ignorePath = new ArrayList<>();
         this.folder = Paths.get(config.getPropertyValue("folder"));
-        this.dirWatcher = new WatchDir(folder, true, fileHash, fileEvent);
-        this.config = config;
+        Path hashFile = Paths.get(this.folder.toString() + File.separator + config.getPropertyValue("hashFile"));
+        ignorePath.add(hashFile);
+
+        this.dirWatcher = new WatchDir(folder, true, fileCurrentHash, fileEvent, ignorePath);
+        this.hashManager = new HashManager(hashFile);
 
         keepProcessing = true;
     }
@@ -87,7 +86,13 @@ public class DirectoryManager extends Thread
                         case "ENTRY_MODIFY":
                             if (!Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
                             {
-                                new FileSender(receiver, getServerPath(path), path).sendFile();
+                                String fileHash = Hashing.getSHAChecksum(path.toString());
+                                if (!hashManager.hashMatches(path, fileHash))
+                                {
+                                    new FileSender(receiver, getServerPath(path), path).sendFile();
+                                    CustomLogger.log("Uploaded " + path);
+                                    hashManager.updateHash(path.toString(), fileHash);
+                                }
                                 fileEvent.remove(path);
                             }
                             break;
@@ -100,6 +105,7 @@ public class DirectoryManager extends Thread
             }
             catch (Exception ex)
             {
+                // CustomLogger.log(ex.getMessage());
             }
         }
     }
@@ -111,51 +117,6 @@ public class DirectoryManager extends Thread
         keepProcessing = false;
     }
 
-    public DirectoryManager(String logFile) throws IOException, ClassNotFoundException
-    {
-        this.logFile = new File(logFile);
-        this.writeMap = null;
-
-    }
-
-//            mergeHashes();
-//            tempMap.putAll(clientMap);
-    public boolean writeLog(File logFile, HashMap<String, String> map) throws IOException
-    {
-        writeMap.putAll(map);
-        FileOutputStream fos = new FileOutputStream(logFile);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        //anotherMap.putAll(map);
-        oos.writeObject(writeMap);
-        oos.flush();
-        oos.close();
-        return true;
-    }
-
-    public HashMap<String, String> readLog(File logFile) throws IOException, ClassNotFoundException
-    {
-        FileInputStream fis = new FileInputStream(logFile);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        readMap = (HashMap<String, String>) ois.readObject();
-        ois.close();
-        return readMap;
-    }
-
-    public void mergeHashes(HashMap<String, String> map, HashMap<String, String> newMap)
-    {
-        for (String filename : map.keySet())
-        {
-            String compareHash = newMap.get(filename);
-            if (!compareHash.equals(map.get(filename)))
-            {
-                conflict.put(filename, null);
-                //                    clientMap.put(filename, clientMap.get(filename));
-                //                    tempMap.remove(filename);
-
-            }
-        }
-    }
-
     @Override
     public void run()
     {
@@ -165,7 +126,7 @@ public class DirectoryManager extends Thread
 
     private String getServerPath(Path child)
     {
-        String serverpath = child.toString().replace(folder + File.separator, "");
+        String serverpath = child.toString().replace(folder + File.separator, "").replaceAll(child.getFileName() + "$", "");
         try
         {
             serverpath = serverpath.replace(File.separator, receiver.pathSeperator());
@@ -174,7 +135,7 @@ public class DirectoryManager extends Thread
         {
             Logger.getLogger(DirectoryManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        CustomLogger.log("Serverpath " + serverpath);
+        CustomLogger.log("Serverpath - /" + serverpath);
         return serverpath;
     }
 
@@ -183,7 +144,7 @@ public class DirectoryManager extends Thread
         ServerDetails serverDetails = serverDetailsGetter.getServerDetails();
         Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
         receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
-        receiver.setDirectory(config.getPropertyValue("hash"));
+        receiver.setDirectory(userHash);
         return receiver;
     }
 }
