@@ -17,7 +17,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class represents the operation regarding file and its hash
+ * <p>
+ * Write hash file
+ * <p/>
+ * <p>
+ * read from hash file the hashmap
+ * <p/>
+ * <p>
+ * update the existed hashmap
+ * <p/>
  * @author harsimran.maan
  */
 public class HashManager
@@ -27,6 +36,11 @@ public class HashManager
     private HashMap<String, String> lastKnownServerHashes;
     private HashMap<Path, String> fileEvent;
 
+    /**
+     *
+     * @param filePath
+     * @param fileEvent
+     */
     public HashManager(Path filePath, HashMap<Path, String> fileEvent)
     {
         this.hashFile = new File(filePath.toString());
@@ -38,6 +52,9 @@ public class HashManager
         }
     }
 
+    /**
+     * Reads the data from the hash file
+     */
     private void readHashes()
     {
         try
@@ -58,6 +75,9 @@ public class HashManager
         }
     }
 
+    /**
+     * Wrties the hash map data to the hash file
+     */
     private void writeHashes()
     {
         try
@@ -75,11 +95,24 @@ public class HashManager
         }
     }
 
+    /**
+     * checks the hash map of two files
+     * <p/>
+     * @param key
+     * @param clientHash <p/>
+     * @return true of matches otherwise false
+     */
     public boolean hashMatches(Path key, String clientHash)
     {
         return clientHash.equals(lastKnownServerHashes.get(key.toString()));
     }
 
+    /**
+     * Updates the hash of the file and writes it to the hash file
+     * <p/>
+     * @param key
+     * @param hash
+     */
     public void updateHash(String key, String hash)
     {
         lastKnownServerHashes.put(key, hash);

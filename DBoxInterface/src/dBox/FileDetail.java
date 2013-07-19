@@ -7,7 +7,8 @@ package dBox;
 import java.io.File;
 
 /**
- *
+ * File details
+ * <p/>
  * @author Kuntal
  */
 public class FileDetail

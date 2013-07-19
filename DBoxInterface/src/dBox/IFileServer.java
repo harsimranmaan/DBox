@@ -49,7 +49,8 @@ public interface IFileServer extends Remote
      * Checks if the file or folder at a path has changed
      * <p/>
      * @param path <p/>
-     * @return <p/>
+     * @return client authentication
+     * <p/>
      * @throws RemoteException
      */
     public ClientAction hasChanged(String path, HashMap<String, String> fileHashes) throws RemoteException;

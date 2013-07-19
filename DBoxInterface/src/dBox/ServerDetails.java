@@ -7,7 +7,8 @@ package dBox;
 import java.io.Serializable;
 
 /**
- *
+ * Class represents the server property
+ * <p/>
  * @author harsimran.maan
  */
 public class ServerDetails implements Serializable
@@ -17,6 +18,12 @@ public class ServerDetails implements Serializable
     private String serverName;
     private int port;
 
+    /**
+     * initiates the server name and port
+     * <p/>
+     * @param serverName
+     * @param port
+     */
     public ServerDetails(String serverName, int port)
     {
         this.serverName = serverName;
