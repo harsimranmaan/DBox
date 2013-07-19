@@ -121,10 +121,21 @@ public class DirectoryManager extends Thread
         }
     }
 
+    /**
+     *
+     * @param path
+     */
     private void downLoadFile(Path path)
     {
     }
 
+    /**
+     * removes the path file
+     * <p/>
+     * @param path
+     * <p/>
+     * @throws IOException
+     */
     private void removeFile(Path path) throws IOException
     {
         Files.delete(path);
@@ -148,9 +159,10 @@ public class DirectoryManager extends Thread
     }
 
     /**
-     *
+     * gets the server path
+     * <p/>
      * @param child <p/>
-     * @return
+     * @return server path string
      */
     private String getServerPath(Path child)
     {

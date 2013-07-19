@@ -301,7 +301,8 @@ class InteractionManager
     }
 
     /**
-     *
+     * prepares command prompt for the user
+     * <p/>
      * @return command string
      */
     private String getInput()
@@ -318,7 +319,8 @@ class InteractionManager
     }
 
     /**
-     *
+     * gets the balance value in double for the given string
+     * <p/>
      * @param bal <p/>
      * @return balance in double format
      * <p/>
@@ -336,7 +338,8 @@ class InteractionManager
     }
 
     /**
-     *
+     * get the integer value of the given string
+     * <p/>
      * @param strInt <p/>
      * @return string in integer format
      * <p/>
