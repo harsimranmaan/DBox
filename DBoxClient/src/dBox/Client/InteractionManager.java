@@ -127,6 +127,12 @@ class InteractionManager
         }
     }
 
+    /**
+     * operates post authentication procedures
+     * <p>
+     * <p/>
+     * @param client </p>
+     */
     private void postAuthentication(ClientDetails client)
     {
         config.setPropertyValue("hash", client.getUserhash());
@@ -152,12 +158,21 @@ class InteractionManager
 
     }
 
+    /**
+     * Checks the existence of the folder
+     * <p/>
+     * @param path <p/>
+     * @return folder existence in boolean format
+     */
     private boolean folderExists(String path)
     {
         File file = new File(path);
         return file.isDirectory();
     }
 
+    /**
+     * Starts directory watcher thread
+     */
     private void setUpDirectoryMonitor()
     {
         try
@@ -173,6 +188,9 @@ class InteractionManager
         }
     }
 
+    /**
+     * Stops the directory watcher thread
+     */
     private void stopFolderMonitor()
     {
         // Kill the thread
