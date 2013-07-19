@@ -19,8 +19,6 @@
 /DBoxServerUtils/nbproject/private/
 /DBoxServerUtils/build/
 /DBoxServerUtils/dist/
-
+/~*
 #Exceptions
 !/DBoxServerUtils/lib/*.jar
-/GachaTest/nbproject/private/
-/GachaTest/build/
