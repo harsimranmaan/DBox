@@ -25,7 +25,7 @@ public class AliveCheck extends Thread
         this.clusterId = clusterId;
         try
         {
-            DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM (SELECT MAX(serverIndex)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + ") AS M))");
+            DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
         }
         catch (SQLException ex)
         {

@@ -6,14 +6,11 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
-import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -179,7 +176,7 @@ class InteractionManager
         try
         {
             stopFolderMonitor();
-            directoryWatch = new DirectoryManager(config.getPropertyValue("hash"), new ServerDetailsGetter(authentication, config), config);
+            directoryWatch = new DirectoryManager(config.getPropertyValue("hash"), new ServerDetailsGetter(authentication), config);
             // Start reading the given path directory
             directoryWatch.start();
         }
