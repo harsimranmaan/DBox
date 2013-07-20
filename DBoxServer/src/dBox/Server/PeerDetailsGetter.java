@@ -47,7 +47,7 @@ public class PeerDetailsGetter
         ServerDetails sDetails;
         try
         {
-            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE my.servername='" + myServerName + "' LIMIT 1");
+            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE servername='" + myServerName + "' LIMIT 1");
             if (set != null && set.next())
             {
                 sDetails = new ServerDetails(set.getString("monitoring"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
