@@ -6,6 +6,7 @@ package dBox.Client;
 
 import dBox.ClientAction;
 import dBox.FileDeleter;
+import dBox.FilePacket;
 import dBox.FileSender;
 import dBox.HashManager;
 import dBox.IFileServer;
@@ -16,7 +17,9 @@ import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -97,7 +100,7 @@ public class DirectoryManager extends Thread
                             case "ENTRY_DELETE":
                                 String oldHash = hashManager.getValue(path);
                                 action = receiver.actionOnDelete(getServerPathFull(path), oldHash);
-                                System.out.println(action);
+
                                 switch (action)
                                 {
                                     case DOWNLOAD:
@@ -120,6 +123,7 @@ public class DirectoryManager extends Thread
                                     {
                                         String fileHash = Hashing.getSHAChecksum(path.toString());
                                         action = receiver.actionOnModify(getServerPathFull(path), fileHash, hashManager.getValue(path));
+                                        System.out.println(action);
                                         try
                                         {
                                             switch (action)
@@ -130,8 +134,9 @@ public class DirectoryManager extends Thread
                                                     CustomLogger.log("Uploaded " + path);
                                                     break;
                                                 case DOWNLOAD:
-                                                    downLoadFile(path);
-                                                    hashManager.updateHash(path, fileHash);
+
+                                                    hashManager.updateHash(path, downLoadFile(path));
+
                                                     CustomLogger.log("Downloaded " + path);
                                                     break;
                                                 case CONFLICT:
@@ -190,10 +195,20 @@ public class DirectoryManager extends Thread
      * <p/>
      * @param path
      */
-    private String downLoadFile(Path path)
+    private String downLoadFile(Path path) throws RemoteException
     {
+        FilePacket download = receiver.download(getServerPathFull(path));
+        try
+        {
+            OutputStream out = new FileOutputStream(path.toString());
+            download.copy(out);
+        }
+        catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(DirectoryManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        return "hash";
+        return Hashing.getSHAChecksum(path.toString());
     }
 
     /**

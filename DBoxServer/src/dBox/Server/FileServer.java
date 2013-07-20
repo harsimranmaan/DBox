@@ -15,6 +15,7 @@ import dBox.utils.Hashing;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -59,6 +60,10 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public ClientAction actionOnModify(String path, String fileHash, String oldHash) throws RemoteException
     {
+        if (path.equals("a.txt"))
+        {
+            return ClientAction.DOWNLOAD;
+        }
         File theFile = new File(path);
         if (!theFile.exists())
         {
@@ -127,5 +132,13 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
                 return ClientAction.DOWNLOAD;
             }
         }
+    }
+
+    @Override
+    public FilePacket download(String path) throws RemoteException
+    {
+        Path myPath = Paths.get(this.directory + File.separator + path);
+        System.out.println(myPath.toString());
+        return new FilePacket(myPath);
     }
 }

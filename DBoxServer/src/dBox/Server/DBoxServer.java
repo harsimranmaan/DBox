@@ -63,7 +63,7 @@ public class DBoxServer
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
             new AliveCheck(server, port, clusterId).start();
-            new ServerSyncChecker(server, port).start();
+            //   new ServerSyncChecker(server, port).start();
             System.out.println("Server started");
         }
         catch (RemoteException ex)

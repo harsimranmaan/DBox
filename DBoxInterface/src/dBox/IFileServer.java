@@ -34,6 +34,8 @@ public interface IFileServer extends Remote
      */
     public void receiveFile(String path, FilePacket packet) throws RemoteException;
 
+    public FilePacket download(String path) throws RemoteException;
+
     /**
      * Get the server path separator
      * <p/>
