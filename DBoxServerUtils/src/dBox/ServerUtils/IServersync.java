@@ -20,5 +20,5 @@ public interface IServersync extends Remote
 
     public String getHash(String path) throws RemoteException;
 
-    void getFile(String path, String serverName, int port) throws RemoteException;
+    FilePacket getFile(String path) throws RemoteException;
 }

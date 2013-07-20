@@ -4,10 +4,7 @@
  */
 package dBox;
 
-import com.healthmarketscience.rmiio.RemoteInputStreamServer;
-import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.rmi.RemoteException;
@@ -42,16 +39,10 @@ public class FileSender extends Thread
     {
         try
         {
-            FileInputStream stream = new FileInputStream(clientFile.toFile());
-            RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(stream);
-            FilePacket packet = new FilePacket(clientFile.getFileName().toString(), remoteFileData.export());
+            FilePacket packet = new FilePacket(clientFile);
             receiver.receiveFile(serverPath, packet);
         }
         catch (RemoteException ex)
-        {
-            Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (IOException ex)
         {
             Logger.getLogger(FileSender.class.getName()).log(Level.SEVERE, null, ex);
         }

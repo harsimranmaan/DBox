@@ -7,12 +7,10 @@ package dBox;
 /**
  *
  * @author harsimran.maan
+ * <p/>
  */
-import com.healthmarketscience.rmiio.RemoteInputStream;
-import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.file.Path;
 
 /**
  * Class to represent a File object that can be sent and recreated on another
@@ -22,8 +20,9 @@ import java.util.logging.Logger;
 public class FilePacket implements Serializable
 {
 
-    private RemoteInputStream fileInputStream;
     private String fileName;
+    // the data in my file
+    private byte[] data;
 
     /**
      * Make a file packet that represents a given filename
@@ -31,10 +30,22 @@ public class FilePacket implements Serializable
      * @param name The filename this represents
      * <p/>
      */
-    public FilePacket(String fileName, RemoteInputStream fileInputStream)
+    public FilePacket(Path fileName)
     {
-        this.fileInputStream = fileInputStream;
-        this.fileName = fileName;
+        try
+        {
+            File file = fileName.toFile();
+            data = new byte[(int) (file.length())];
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(data);
+            fileInputStream.close();
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        this.fileName = fileName.getFileName().toString();
     }
 
     /**
@@ -56,23 +67,15 @@ public class FilePacket implements Serializable
     {
         try
         {
-            byte[] buffer = new byte[4096]; // To hold file contents
-            int bytes_read; // How many bytes in buffer
-            try (InputStream fileData = RemoteInputStreamClient.wrap(fileInputStream))
+            if (data != null)
             {
-                while ((bytes_read = fileData.read(buffer)) != -1)
-                // Read until EOF
-                {
-                    out.write(buffer, 0, bytes_read);
-                }
+                out.write(data);
             }
             out.close();
-
         }
-        catch (IOException ex)
+        catch (Exception e)
         {
-
-            Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex);
+            e.printStackTrace();
         }
 
     }

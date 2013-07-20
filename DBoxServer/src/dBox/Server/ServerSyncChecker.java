@@ -7,12 +7,15 @@ package dBox.Server;
 import dBox.FilePacket;
 import dBox.ServerDetails;
 import dBox.ServerUtils.IServersync;
+import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -63,7 +66,7 @@ public class ServerSyncChecker extends Thread
         }
         catch (Exception ex)
         {
-            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex.getMessage());
         }
 //        while (true)
 //        {
@@ -72,7 +75,24 @@ public class ServerSyncChecker extends Thread
 
     private void copyFile(String path) throws RemoteException
     {
-        syncProvider.getFile(path, myServername, port);
+        FilePacket packet = syncProvider.getFile(path);
+        Path get = Paths.get(path);
+        String pathOnServer = get.toString().replaceAll(packet.getName() + "$", "");
+        CustomLogger.log("Path copied " + pathOnServer);
+        File theFile = new File(pathOnServer);
+        theFile.mkdirs();
+        pathOnServer += packet.getName();
+
+        try
+        {
+            OutputStream out = new FileOutputStream(pathOnServer);
+            packet.copy(out);
+        }
+        catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     @Override

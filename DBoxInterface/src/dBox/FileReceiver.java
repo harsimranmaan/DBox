@@ -34,14 +34,13 @@ public class FileReceiver
     {
         try
         {
-            String pathOnServer = directory + File.separator + path;;
+            String pathOnServer = directory + File.separator + path;
             CustomLogger.log("Path on server " + pathOnServer);
             File theFile = new File(pathOnServer);
             theFile.mkdirs();
             pathOnServer += packet.getName();
             OutputStream out = new FileOutputStream(pathOnServer);
             packet.copy(out);
-            out.close();
         }
         catch (IOException ex)
         {
