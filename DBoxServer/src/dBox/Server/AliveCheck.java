@@ -18,6 +18,7 @@ public class AliveCheck extends Thread
 
     private String server;
     private final int clusterId;
+    private int serverIndex;
 
     public AliveCheck(String server, int port, int clusterId)
     {
@@ -26,8 +27,13 @@ public class AliveCheck extends Thread
         try
         {
             DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
+            serverIndex = new PeerDetailsGetter().getServerDetails(server).getServerIndex();
         }
         catch (SQLException ex)
+        {
+            Logger.getLogger(AliveCheck.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (Exception ex)
         {
             Logger.getLogger(AliveCheck.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -40,6 +46,7 @@ public class AliveCheck extends Thread
             try
             {
                 DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET lastCheck=now() WHERE servername='" + server + "'");
+                DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET monitoring = (SELECT m FROM(SELECT MAX(sd.serverIndex) as m from ServerDetails sd where sd.clusterId =" + clusterId + " AND sd.serverIndex < " + serverIndex + ") AS M) WHERE servername = '" + server + "' AND monitoring IS NULL");
             }
             catch (SQLException ex)
             {

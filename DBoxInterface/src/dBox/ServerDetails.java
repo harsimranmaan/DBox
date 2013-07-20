@@ -18,6 +18,7 @@ public class ServerDetails implements Serializable
     private String serverName;
     private int port;
     private int clusterId;
+    private final int serverIndex;
 
     /**
      * initiates the server name and port
@@ -25,11 +26,12 @@ public class ServerDetails implements Serializable
      * @param serverName
      * @param port
      */
-    public ServerDetails(String serverName, int port, int clusterId)
+    public ServerDetails(String serverName, int port, int clusterId, int serverIndex)
     {
         this.serverName = serverName;
         this.port = port;
         this.clusterId = clusterId;
+        this.serverIndex = serverIndex;
     }
 
     /**
@@ -54,5 +56,13 @@ public class ServerDetails implements Serializable
     public int getClusterId()
     {
         return clusterId;
+    }
+
+    /**
+     * @return the serverIndex
+     */
+    public int getServerIndex()
+    {
+        return serverIndex;
     }
 }

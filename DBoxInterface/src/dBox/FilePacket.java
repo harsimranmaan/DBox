@@ -8,6 +8,8 @@ package dBox;
  *
  * @author harsimran.maan
  */
+import com.healthmarketscience.rmiio.RemoteInputStream;
+import com.healthmarketscience.rmiio.RemoteInputStreamClient;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,10 +22,8 @@ import java.util.logging.Logger;
 public class FilePacket implements Serializable
 {
 
-    // the file name I represent
-    private String path;
+    private RemoteInputStream fileInputStream;
     private String fileName;
-    private FileInputStream fileInputStream;
 
     /**
      * Make a file packet that represents a given filename
@@ -31,19 +31,10 @@ public class FilePacket implements Serializable
      * @param name The filename this represents
      * <p/>
      */
-    public FilePacket(String path, String fileName)
+    public FilePacket(String fileName, RemoteInputStream fileInputStream)
     {
-        this.path = path;
+        this.fileInputStream = fileInputStream;
         this.fileName = fileName;
-        File file = new File(path);
-        try
-        {
-            this.fileInputStream = new FileInputStream(file);
-        }
-        catch (FileNotFoundException ex)
-        {
-            Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
@@ -67,32 +58,20 @@ public class FilePacket implements Serializable
         {
             byte[] buffer = new byte[4096]; // To hold file contents
             int bytes_read; // How many bytes in buffer
-
-            // Read a chunk of bytes into the buffer, then write them out,
-            // looping until we reach the end of the file (when read() returns
-            // -1). Note the combination of assignment and comparison in this
-            // while loop. This is a common I/O programming idiom.
-            while ((bytes_read = fileInputStream.read(buffer)) != -1)
-            // Read until EOF
+            try (InputStream fileData = RemoteInputStreamClient.wrap(fileInputStream))
             {
-                out.write(buffer, 0, bytes_read);
+                while ((bytes_read = fileData.read(buffer)) != -1)
+                // Read until EOF
+                {
+                    out.write(buffer, 0, bytes_read);
+                }
             }
-
-            //  fileInputStream.read(data);
-            fileInputStream.close();
             out.close();
 
         }
         catch (IOException ex)
         {
-            try
-            {
-                fileInputStream.close();
-            }
-            catch (IOException ex1)
-            {
-                Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+
             Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex);
         }
 

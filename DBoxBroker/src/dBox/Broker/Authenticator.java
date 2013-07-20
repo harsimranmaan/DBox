@@ -120,18 +120,18 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
             ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE clusterId = " + clusterId + " ORDER BY serverIndex LIMIT 1");
             if (set != null && set.next())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"));
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), 0);
             }
             else
             {
-                sDetails = new ServerDetails(defaultServer, port, clusterId);
+                sDetails = new ServerDetails(defaultServer, port, clusterId, 0);
             }
             return sDetails;
         }
         catch (SQLException ex)
         {
             Logger.getLogger(Authenticator.class.getName()).log(Level.SEVERE, null, ex);
-            sDetails = new ServerDetails(defaultServer, port, clusterId);
+            sDetails = new ServerDetails(defaultServer, port, clusterId, 0);
         }
         return sDetails;
     }

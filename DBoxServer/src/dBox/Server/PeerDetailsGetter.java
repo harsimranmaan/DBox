@@ -26,7 +26,7 @@ public class PeerDetailsGetter
             ResultSet set = DataAccess.getResultSet("SELECT S.* FROM ServerDetails S, ServerDetails my WHERE my.servername='" + myServerName + "' AND S.servername=my.monitoring AND S.clusterId=my.clusterId ORDER BY serverIndex LIMIT 1");
             if (set != null && set.next())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"));
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
                 return sDetails;
             }
             else

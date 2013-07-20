@@ -175,11 +175,11 @@ public class DirectoryManager extends Thread
                         }
                     }
                 }
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             }
             catch (Exception ex)
             {
-                CustomLogger.log(ex.getMessage());
+                //  CustomLogger.log(ex.getMessage());
             }
         }
     }

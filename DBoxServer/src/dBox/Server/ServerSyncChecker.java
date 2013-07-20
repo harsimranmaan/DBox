@@ -31,10 +31,12 @@ public class ServerSyncChecker extends Thread
     private final PeerDetailsGetter peerDetails;
     private IServersync syncProvider;
     private ServerDetails monitorDetails;
+    private final int port;
 
-    public ServerSyncChecker(String myServername)
+    public ServerSyncChecker(String myServername, int port)
     {
         this.myServername = myServername;
+        this.port = port;
         this.peerDetails = new PeerDetailsGetter();
     }
 
@@ -70,21 +72,7 @@ public class ServerSyncChecker extends Thread
 
     private void copyFile(String path) throws RemoteException
     {
-        try
-        {
-            FilePacket packet = syncProvider.getFile(path);
-            String pathOnServer = path.replaceAll(packet.getName() + "$", "");
-            File theFile = new File(pathOnServer);
-            theFile.mkdirs();
-            OutputStream out = new FileOutputStream(path);
-            packet.copy(out);
-            out.close();
-        }
-        catch (IOException ex)
-        {
-            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        syncProvider.getFile(path, myServername, port);
     }
 
     @Override

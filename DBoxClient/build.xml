@@ -13,7 +13,7 @@
 	<target name="-post-jar">
             <copy file="config.properties" flatten="true" todir="${dist.dir}" />
 			<copy file="security.policy" flatten="true" todir="${dist.dir}" />
-			<copy todir="${dist.dir}" includeEmptyDirs="false">
+			<copy todir="${dist.dir}" flatten="true" includeEmptyDirs="false">
                 <fileset dir="../DBoxInterface/dist"></fileset>
             </copy>
     </target>

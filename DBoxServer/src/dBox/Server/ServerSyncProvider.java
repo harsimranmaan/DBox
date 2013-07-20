@@ -4,17 +4,29 @@
  */
 package dBox.Server;
 
+import com.healthmarketscience.rmiio.RemoteInputStreamServer;
+import com.healthmarketscience.rmiio.SimpleRemoteInputStream;
 import dBox.FilePacket;
+import dBox.IFileServer;
 import dBox.ServerUtils.IServersync;
 import dBox.utils.Hashing;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.midi.Receiver;
 
 /**
  *
@@ -24,6 +36,7 @@ public class ServerSyncProvider implements IServersync
 {
 
     private final String rootPath;
+    private IFileServer fileServer;
 
     public ServerSyncProvider(String rootPath)
     {
@@ -66,8 +79,45 @@ public class ServerSyncProvider implements IServersync
     }
 
     @Override
-    public FilePacket getFile(String path) throws RemoteException
+    public void getFile(String path, String serverName, int port) throws RemoteException
     {
-        return new FilePacket(path, Paths.get(path).getFileName().toString());
+        setFileServer(serverName, port);
+        if (fileServer != null)
+        {
+            try
+            {
+                Path get = Paths.get(path);
+                FileInputStream stream = new FileInputStream(get.toFile());
+                RemoteInputStreamServer remoteFileData = new SimpleRemoteInputStream(stream);
+                FilePacket packet = new FilePacket(get.getFileName().toString(), remoteFileData.export());
+                fileServer.receiveFile(path, packet);
+                //stream.close();
+            }
+            catch (IOException ex)
+            {
+                Logger.getLogger(ServerSyncProvider.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void setFileServer(String serverName, int port)
+    {
+
+        try
+        {
+            Registry registry = LocateRegistry.getRegistry(serverName, port);
+            fileServer = (IFileServer) registry.lookup(IFileServer.class.getSimpleName());
+        }
+        catch (RemoteException ex)
+        {
+            fileServer = null;
+            Logger.getLogger(ServerSyncProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (NotBoundException ex)
+        {
+            fileServer = null;
+            Logger.getLogger(ServerSyncProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }
