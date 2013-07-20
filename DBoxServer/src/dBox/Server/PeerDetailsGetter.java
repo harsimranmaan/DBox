@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class PeerDetailsGetter
 {
 
-    public ServerDetails getServerDetails(String myServerName) throws Exception
+    public ServerDetails getServerDetails(String myServerName)
     {
         ServerDetails sDetails;
         try
@@ -27,17 +27,18 @@ public class PeerDetailsGetter
             if (set != null && set.next())
             {
                 sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
-                return sDetails;
+
             }
             else
             {
-                throw new Exception("No monitor");
+                sDetails = new ServerDetails(myServerName, 0, 0, 0);
             }
         }
         catch (SQLException ex)
         {
             Logger.getLogger(PeerDetailsGetter.class.getName()).log(Level.SEVERE, null, ex);
-            throw new Exception("No monitor");
+            sDetails = new ServerDetails(myServerName, 0, 0, 0);
         }
+        return sDetails;
     }
 }

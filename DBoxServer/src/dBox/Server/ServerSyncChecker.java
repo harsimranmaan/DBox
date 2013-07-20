@@ -104,7 +104,11 @@ public class ServerSyncChecker extends Thread
 
     private void setProvider() throws Exception
     {
-        Registry registry = LocateRegistry.getRegistry(monitorDetails.getServerName(), monitorDetails.getPort());
-        syncProvider = (IServersync) registry.lookup(IServersync.class.getSimpleName());
+        if (!monitorDetails.getServerName().equals(myServername))
+        {
+
+            Registry registry = LocateRegistry.getRegistry(monitorDetails.getServerName(), monitorDetails.getPort());
+            syncProvider = (IServersync) registry.lookup(IServersync.class.getSimpleName());
+        }
     }
 }
