@@ -21,11 +21,12 @@ CREATE TABLE  ServerDetails  (
 	serverIndex  int NOT NULL,
 	lastCheck TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	clusterId INT default '1',
-	monitor VARCHAR(80),
+	monitoring VARCHAR(80),
 	PRIMARY KEY (servername),
-	UNIQUE KEY ServerDetailsUNIQserverIndex (serverIndex)
+	
+	UNIQUE KEY ServerDetailsUNIQserverIndex (serverIndex,clusterId)
 );
-
+ALTER TABLE ServerDetails ADD CONSTRAINT ServerDetailsFKmonitoring FOREIGN KEY (monitoring) REFERENCES ServerDetails(servername) ON DELETE SET NULL;
 DROP TABLE IF EXISTS ServerSync;
 CREATE TABLE ServerSync(
 servername VARCHAR(80) NOT NULL,
