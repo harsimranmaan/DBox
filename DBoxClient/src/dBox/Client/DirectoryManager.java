@@ -37,7 +37,7 @@ public class DirectoryManager extends Thread
 {
 
     private IServerDetailsGetter serverDetailsGetter;
-//    private ConfigManager config;
+    private ConfigManager config;
     private HashMap<Path, String> fileCurrentHash;
     private HashMap<Path, String> fileEvent;
     private WatchDir dirWatcher;
@@ -69,7 +69,7 @@ public class DirectoryManager extends Thread
 
         this.dirWatcher = new WatchDir(folder, true, fileCurrentHash, fileEvent, ignorePath);
         this.hashManager = new HashManager(hashFile, fileEvent);
-
+        this.config = config;
         keepProcessing = true;
     }
 
@@ -288,7 +288,7 @@ public class DirectoryManager extends Thread
      */
     private IFileServer getReceiver() throws Exception
     {
-        ServerDetails serverDetails = serverDetailsGetter.getServerDetails();
+        ServerDetails serverDetails = serverDetailsGetter.getServerDetails(Integer.parseInt(config.getPropertyValue("clusterId")));
         Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
         receiver = (IFileServer) registry.lookup(IFileServer.class
                 .getSimpleName());

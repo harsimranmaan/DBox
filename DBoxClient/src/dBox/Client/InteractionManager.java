@@ -6,14 +6,11 @@ package dBox.Client;
 
 import dBox.ClientDetails;
 import dBox.IAuthentication;
-import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,18 +134,19 @@ class InteractionManager
     {
         config.setPropertyValue("hash", client.getUserhash());
         config.setPropertyValue("user", client.getUsername());
-        try
-        {
-            ServerDetails serverDetails = authentication.getServerDetails();
-            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
-            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
-            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
-            //        receiver.setDirectory(client.getUserhash());
-        }
-        catch (RemoteException ex)
-        {
-            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        config.setPropertyValue("clusterId", Integer.toString(client.getClusterId()));
+//        try
+//        {
+//            ServerDetails serverDetails = authentication.getServerDetails();
+//            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
+//            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
+//            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+//            //        receiver.setDirectory(client.getUserhash());
+//        }
+//        catch (RemoteException ex)
+//        {
+//            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 //        catch (NotBoundException ex)
 //        {
 //            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);

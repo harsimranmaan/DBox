@@ -23,6 +23,7 @@ public class FilePacket implements Serializable
     // the file name I represent
     private String path;
     private String fileName;
+    private FileInputStream fileInputStream;
 
     /**
      * Make a file packet that represents a given filename
@@ -34,6 +35,15 @@ public class FilePacket implements Serializable
     {
         this.path = path;
         this.fileName = fileName;
+        File file = new File(path);
+        try
+        {
+            this.fileInputStream = new FileInputStream(file);
+        }
+        catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -55,9 +65,6 @@ public class FilePacket implements Serializable
     {
         try
         {
-            File file = new File(path);
-
-            FileInputStream fileInputStream = new FileInputStream(file);
             byte[] buffer = new byte[4096]; // To hold file contents
             int bytes_read; // How many bytes in buffer
 
@@ -78,6 +85,14 @@ public class FilePacket implements Serializable
         }
         catch (IOException ex)
         {
+            try
+            {
+                fileInputStream.close();
+            }
+            catch (IOException ex1)
+            {
+                Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex1);
+            }
             Logger.getLogger(FilePacket.class.getName()).log(Level.SEVERE, null, ex);
         }
 

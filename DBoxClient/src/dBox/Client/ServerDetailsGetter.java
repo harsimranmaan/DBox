@@ -7,6 +7,7 @@ package dBox.Client;
 import dBox.IAuthentication;
 import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
+import dBox.utils.ConfigManager;
 import java.rmi.RemoteException;
 
 /**
@@ -37,8 +38,8 @@ public class ServerDetailsGetter implements IServerDetailsGetter
      * @throws Exception
      */
     @Override
-    public ServerDetails getServerDetails() throws Exception
+    public ServerDetails getServerDetails(int clusterId) throws Exception
     {
-        return auth.getServerDetails();
+        return auth.getServerDetails(clusterId);
     }
 }

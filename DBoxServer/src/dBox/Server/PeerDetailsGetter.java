@@ -4,7 +4,6 @@
  */
 package dBox.Server;
 
-import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
 import dBox.ServerUtils.DataAccess;
 import java.sql.ResultSet;
@@ -16,19 +15,18 @@ import java.util.logging.Logger;
  *
  * @author harsimran.maan
  */
-public class PeerDetailsGetter implements IServerDetailsGetter
+public class PeerDetailsGetter
 {
 
-    @Override
-    public ServerDetails getServerDetails() throws Exception
+    public ServerDetails getServerDetails(String myServerName) throws Exception
     {
         ServerDetails sDetails;
         try
         {
-            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails ORDER BY serverIndex LIMIT 1");
+            ResultSet set = DataAccess.getResultSet("SELECT S.* FROM ServerDetails S, ServerDetails my WHERE my.servername='" + myServerName + "' AND S.servername=my.monitoring AND S.clusterId=my.clusterId ORDER BY serverIndex LIMIT 1");
             if (set != null && set.next())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"));
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"));
                 return sDetails;
             }
             else

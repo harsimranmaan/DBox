@@ -18,12 +18,14 @@ public class ClientDetails implements Serializable
     private String username;
     private String userhash;
     private int quota;
+    private int clusterId;
 
-    public ClientDetails(String username, String hash, int quota)
+    public ClientDetails(String username, String hash, int quota, int clusterId)
     {
         this.username = username;
         this.userhash = hash;
         this.quota = quota;
+        this.clusterId = clusterId;
     }
 
     /**
@@ -48,5 +50,13 @@ public class ClientDetails implements Serializable
     public int getQuota()
     {
         return quota;
+    }
+
+    /**
+     * @return the clusterId
+     */
+    public int getClusterId()
+    {
+        return clusterId;
     }
 }

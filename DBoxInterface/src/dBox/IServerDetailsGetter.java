@@ -18,5 +18,5 @@ public interface IServerDetailsGetter
      * <p/>
      * @throws Exception
      */
-    ServerDetails getServerDetails() throws Exception;
+    ServerDetails getServerDetails(int clusterId) throws Exception;
 }

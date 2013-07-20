@@ -17,13 +17,15 @@ public class AliveCheck extends Thread
 {
 
     private String server;
+    private final int clusterId;
 
-    public AliveCheck(String server, int port)
+    public AliveCheck(String server, int port, int clusterId)
     {
         this.server = server;
+        this.clusterId = clusterId;
         try
         {
-            DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails ) AS M), now())");
+            DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
         }
         catch (SQLException ex)
         {
