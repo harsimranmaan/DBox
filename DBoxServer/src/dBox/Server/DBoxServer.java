@@ -51,13 +51,14 @@ public class DBoxServer
             System.setProperty("java.net.preferIPv4Stack", "true");
             // Bind the remote object in the registry
             int port = Integer.parseInt(context.getPropertyValue("port"));
-            CustomLogger.log("Starting server " + server + " on port " + port);
+            int clusterId = Integer.parseInt(context.getPropertyValue("clusterId"));
+            CustomLogger.log("Starting server " + server + " on port " + port + " on cluster " + clusterId);
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(IFileServer.class.getSimpleName(), new FileServer());
             CustomLogger.log("Bound " + IFileServer.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
-            new AliveCheck(server, port).start();
+            new AliveCheck(server, port, clusterId).start();
             System.out.println("Server started");
         }
         catch (RemoteException ex)

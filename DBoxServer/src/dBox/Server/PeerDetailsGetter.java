@@ -28,7 +28,7 @@ public class PeerDetailsGetter implements IServerDetailsGetter
             ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails ORDER BY serverIndex LIMIT 1");
             if (set != null && set.next())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"));
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"));
                 return sDetails;
             }
             else

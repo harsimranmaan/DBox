@@ -17,6 +17,7 @@ public class ServerDetails implements Serializable
     private static final long serialVersionUID = 11211L;
     private String serverName;
     private int port;
+    private int clusterId;
 
     /**
      * initiates the server name and port
@@ -24,10 +25,11 @@ public class ServerDetails implements Serializable
      * @param serverName
      * @param port
      */
-    public ServerDetails(String serverName, int port)
+    public ServerDetails(String serverName, int port, int clusterId)
     {
         this.serverName = serverName;
         this.port = port;
+        this.clusterId = clusterId;
     }
 
     /**
@@ -44,5 +46,13 @@ public class ServerDetails implements Serializable
     public int getPort()
     {
         return port;
+    }
+
+    /**
+     * @return the clusterId
+     */
+    public int getClusterId()
+    {
+        return clusterId;
     }
 }

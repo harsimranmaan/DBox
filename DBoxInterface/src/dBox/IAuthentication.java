@@ -30,8 +30,7 @@ public interface IAuthentication extends Remote
     /**
      * authenticates user with hash if property file has updated it
      * <p/>
-     * @param hash
-     * <p/>
+     * @param hash <p/>
      * @return client details
      * <p/>
      * @throws RemoteException
@@ -45,5 +44,5 @@ public interface IAuthentication extends Remote
      * <p/>
      * @throws RemoteException
      */
-    ServerDetails getServerDetails() throws RemoteException;
+    ServerDetails getServerDetails(int clusterId) throws RemoteException;
 }

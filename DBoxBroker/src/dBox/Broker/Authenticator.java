@@ -50,7 +50,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
                 ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where username = '" + userName + "' AND userpassword = '" + Hashing.encryptSHA(password) + "'");
                 if (set != null && set.next())
                 {
-                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"));
+                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"), set.getInt("clusterId"));
                 }
                 else
                 {
@@ -82,7 +82,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
                 ResultSet set = DataAccess.getResultSet("SELECT * FROM Client where pairhash = '" + hash + "'");
                 if (set != null && set.next())
                 {
-                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"));
+                    client = new ClientDetails(set.getString("username"), set.getString("pairhash"), set.getInt("quota"), set.getInt("clusterId"));
                 }
                 else
                 {
@@ -103,35 +103,35 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     }
 
     @Override
-    public ServerDetails getServerDetails() throws RemoteException
+    public ServerDetails getServerDetails(int clusterId) throws RemoteException
     {
         ConfigManager config = ConfigManager.getInstance();
         String server = config.getPropertyValue("localserver");
         int port = Integer.parseInt(config.getPropertyValue("serverPort"));
-        return getPrimaryServer(server, port);
+        return getPrimaryServer(server, port, clusterId);
 
     }
 
-    private ServerDetails getPrimaryServer(String defaultServer, int port)
+    private ServerDetails getPrimaryServer(String defaultServer, int port, int clusterId)
     {
         ServerDetails sDetails;
         try
         {
-            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails ORDER BY serverIndex LIMIT 1");
+            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE clusterId = " + clusterId + " ORDER BY serverIndex LIMIT 1");
             if (set != null && set.next())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"));
+                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"));
             }
             else
             {
-                sDetails = new ServerDetails(defaultServer, port);
+                sDetails = new ServerDetails(defaultServer, port, clusterId);
             }
             return sDetails;
         }
         catch (SQLException ex)
         {
             Logger.getLogger(Authenticator.class.getName()).log(Level.SEVERE, null, ex);
-            sDetails = new ServerDetails(defaultServer, port);
+            sDetails = new ServerDetails(defaultServer, port, clusterId);
         }
         return sDetails;
     }

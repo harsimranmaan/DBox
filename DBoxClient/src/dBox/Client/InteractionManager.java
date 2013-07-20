@@ -137,18 +137,19 @@ class InteractionManager
     {
         config.setPropertyValue("hash", client.getUserhash());
         config.setPropertyValue("user", client.getUsername());
-        try
-        {
-            ServerDetails serverDetails = authentication.getServerDetails();
-            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
-            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
-            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
-            //        receiver.setDirectory(client.getUserhash());
-        }
-        catch (RemoteException ex)
-        {
-            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        config.setPropertyValue("clusterId", Integer.toString(client.getClusterId()));
+//        try
+//        {
+//            ServerDetails serverDetails = authentication.getServerDetails();
+//            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
+//            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
+//            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
+//            //        receiver.setDirectory(client.getUserhash());
+//        }
+//        catch (RemoteException ex)
+//        {
+//            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 //        catch (NotBoundException ex)
 //        {
 //            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -178,7 +179,7 @@ class InteractionManager
         try
         {
             stopFolderMonitor();
-            directoryWatch = new DirectoryManager(config.getPropertyValue("hash"), new ServerDetailsGetter(authentication), config);
+            directoryWatch = new DirectoryManager(config.getPropertyValue("hash"), new ServerDetailsGetter(authentication, config), config);
             // Start reading the given path directory
             directoryWatch.start();
         }

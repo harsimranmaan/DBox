@@ -7,6 +7,7 @@ package dBox.Client;
 import dBox.IAuthentication;
 import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
+import dBox.utils.ConfigManager;
 import java.rmi.RemoteException;
 
 /**
@@ -18,15 +19,17 @@ public class ServerDetailsGetter implements IServerDetailsGetter
 {
 
     private IAuthentication auth;
+    private final ConfigManager config;
 
     /**
      * initiates authenticate to receive server detail
      * <p/>
      * @param auth
      */
-    public ServerDetailsGetter(IAuthentication auth)
+    public ServerDetailsGetter(IAuthentication auth, ConfigManager config)
     {
         this.auth = auth;
+        this.config = config;
     }
 
     /**
@@ -39,6 +42,6 @@ public class ServerDetailsGetter implements IServerDetailsGetter
     @Override
     public ServerDetails getServerDetails() throws Exception
     {
-        return auth.getServerDetails();
+        return auth.getServerDetails(Integer.parseInt(config.getPropertyValue("clusterId")));
     }
 }
