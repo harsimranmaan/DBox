@@ -45,8 +45,7 @@ public class ServerSyncChecker extends Thread
 
     private boolean firstTimeSync() throws Exception
     {
-        this.monitorDetails = peerDetails.getServerDetails(myServername);
-        setProvider();
+        setMonitor();
         HashMap<String, String> allFileNames = this.syncProvider.getAllFileNames();
         System.out.println(allFileNames);
         for (String path : allFileNames.keySet())
@@ -96,6 +95,12 @@ public class ServerSyncChecker extends Thread
 
     }
 
+    private void setMonitor() throws Exception
+    {
+        this.monitorDetails = peerDetails.getMonitorDetails(myServername);
+        setProvider();
+    }
+
     @Override
     public void run()
     {
@@ -104,11 +109,7 @@ public class ServerSyncChecker extends Thread
 
     private void setProvider() throws Exception
     {
-        if (!monitorDetails.getServerName().equals(myServername))
-        {
-
-            Registry registry = LocateRegistry.getRegistry(monitorDetails.getServerName(), monitorDetails.getPort());
-            syncProvider = (IServersync) registry.lookup(IServersync.class.getSimpleName());
-        }
+        Registry registry = LocateRegistry.getRegistry(monitorDetails.getServerName(), monitorDetails.getPort());
+        syncProvider = (IServersync) registry.lookup(IServersync.class.getSimpleName());
     }
 }
