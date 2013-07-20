@@ -28,6 +28,8 @@ public class AliveCheck extends Thread
         {
             DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
             serverIndex = new PeerDetailsGetter().getServerDetails(server).getServerIndex();
+            DataAccess.updateOrInsertSingle("DELETE ServerSync WHERE servername='" + server + "'");
+
         }
         catch (SQLException ex)
         {
@@ -54,7 +56,7 @@ public class AliveCheck extends Thread
             }
             try
             {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
             }
             catch (InterruptedException ex)
             {
