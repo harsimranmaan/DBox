@@ -49,7 +49,7 @@ public class AliveCheck extends Thread
             try
             {
                 DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET lastCheck=now() WHERE servername='" + server + "'");
-                DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET monitoring = (SELECT m FROM(SELECT MAX(sd.serverIndex) as m from ServerDetails sd where sd.clusterId =" + clusterId + " AND sd.serverIndex < " + serverIndex + ") AS M) WHERE servername = '" + server + "' AND monitoring IS NULL");
+                //  DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET monitoring = (SELECT m FROM(SELECT MAX(sd.serverIndex) as m from ServerDetails sd where sd.clusterId =" + clusterId + " AND sd.serverIndex < " + serverIndex + ") AS M) WHERE servername = '" + server + "' AND monitoring IS NULL");
             }
             catch (SQLException ex)
             {
