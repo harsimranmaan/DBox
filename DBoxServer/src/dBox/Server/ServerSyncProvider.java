@@ -5,6 +5,7 @@
 package dBox.Server;
 
 import dBox.FilePacket;
+import dBox.FileToucher;
 import dBox.ServerUtils.IServersync;
 import dBox.utils.Hashing;
 import java.io.File;
@@ -14,6 +15,7 @@ import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -30,32 +32,13 @@ public class ServerSyncProvider implements IServersync, Serializable
         this.rootPath = rootPath;
     }
 
-    private void touchAllFiles(Path path, HashMap<String, String> list)
-    {
-
-        File folder = new File(path.toString());
-        File[] filelist = folder.listFiles();
-        Path filepath;
-        for (int i = 0; i < filelist.length; i++)
-        {
-            filepath = filelist[i].toPath();
-            if (Files.isDirectory(filepath, NOFOLLOW_LINKS))
-            {
-                touchAllFiles(filepath, list);
-            }
-            else
-            {
-                list.put(filepath.toString(), Hashing.getSHAChecksum(filepath.toString()));
-            }
-        }
-    }
-
     @Override
     public HashMap<String, String> getAllFileNames() throws RemoteException
     {
         HashMap<String, String> list = new HashMap<String, String>();
+
         Path rootPath = Paths.get(this.rootPath);
-        touchAllFiles(rootPath, list);
+        FileToucher.touchAll(rootPath, list, true);
         return list;
     }
 
