@@ -19,7 +19,7 @@ public class FileServerMonitor extends Thread
     @Override
     public void run()
     {
-        int timeout = 15;
+        int timeout = 7;
         while (true)
         {
             try
@@ -32,7 +32,7 @@ public class FileServerMonitor extends Thread
             }
             try
             {
-                Thread.sleep(8000);
+                Thread.sleep(4000);
             }
             catch (InterruptedException ex)
             {

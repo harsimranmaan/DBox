@@ -57,7 +57,7 @@ public class AliveCheck extends Thread
             }
             try
             {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             }
             catch (InterruptedException ex)
             {

@@ -98,6 +98,7 @@ public class ServerSyncChecker extends Thread
     private void setMonitor() throws Exception
     {
         this.monitorDetails = peerDetails.getMonitorDetails(myServername);
+        System.out.println(monitorDetails.getServerName() + " " + myServername);
         setProvider();
     }
 
