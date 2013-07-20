@@ -8,6 +8,7 @@ import dBox.FilePacket;
 import dBox.ServerUtils.IServersync;
 import dBox.utils.Hashing;
 import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Files;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.nio.file.Path;
@@ -19,7 +20,7 @@ import java.util.HashMap;
  *
  * @author harsimran.maan
  */
-public class ServerSyncProvider implements IServersync
+public class ServerSyncProvider implements IServersync, Serializable
 {
 
     private final String rootPath;
