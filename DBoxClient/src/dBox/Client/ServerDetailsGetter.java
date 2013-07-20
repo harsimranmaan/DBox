@@ -19,17 +19,15 @@ public class ServerDetailsGetter implements IServerDetailsGetter
 {
 
     private IAuthentication auth;
-    private final ConfigManager config;
 
     /**
      * initiates authenticate to receive server detail
      * <p/>
      * @param auth
      */
-    public ServerDetailsGetter(IAuthentication auth, ConfigManager config)
+    public ServerDetailsGetter(IAuthentication auth)
     {
         this.auth = auth;
-        this.config = config;
     }
 
     /**
@@ -40,8 +38,8 @@ public class ServerDetailsGetter implements IServerDetailsGetter
      * @throws Exception
      */
     @Override
-    public ServerDetails getServerDetails() throws Exception
+    public ServerDetails getServerDetails(int clusterId) throws Exception
     {
-        return auth.getServerDetails(Integer.parseInt(config.getPropertyValue("clusterId")));
+        return auth.getServerDetails(clusterId);
     }
 }

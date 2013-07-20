@@ -6,9 +6,11 @@ package dBox.Server;
 
 import dBox.IFileServer;
 import dBox.ServerUtils.DataAccess;
+import dBox.ServerUtils.IServersync;
 import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
+import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -56,9 +58,12 @@ public class DBoxServer
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(IFileServer.class.getSimpleName(), new FileServer());
             CustomLogger.log("Bound " + IFileServer.class.getSimpleName());
+            registry.rebind(IServersync.class.getSimpleName(), new ServerSyncProvider(System.getProperty("user.home") + File.separator + context.getPropertyValue("rootPath")));
+            CustomLogger.log("Bound " + IServersync.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
             new AliveCheck(server, port, clusterId).start();
+            new ServerSyncChecker(server).start();
             System.out.println("Server started");
         }
         catch (RemoteException ex)
