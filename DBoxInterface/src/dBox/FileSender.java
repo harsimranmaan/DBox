@@ -4,8 +4,6 @@
  */
 package dBox;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.util.logging.Level;

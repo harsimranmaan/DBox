@@ -48,6 +48,7 @@ public class ServerSyncChecker extends Thread
         this.monitorDetails = peerDetails.getServerDetails(myServername);
         setProvider();
         HashMap<String, String> allFileNames = this.syncProvider.getAllFileNames();
+        System.out.println(allFileNames);
         for (String path : allFileNames.keySet())
         {
             if (!Hashing.getSHAChecksum(path).equals(allFileNames.get(path)))
@@ -66,7 +67,7 @@ public class ServerSyncChecker extends Thread
         }
         catch (Exception ex)
         {
-            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+            Logger.getLogger(ServerSyncChecker.class.getName()).log(Level.SEVERE, null, ex);
         }
 //        while (true)
 //        {

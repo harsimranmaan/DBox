@@ -5,23 +5,15 @@
 package dBox.Server;
 
 import dBox.FilePacket;
-import dBox.IFileServer;
 import dBox.ServerUtils.IServersync;
 import dBox.utils.Hashing;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -31,7 +23,6 @@ public class ServerSyncProvider implements IServersync
 {
 
     private final String rootPath;
-    private IFileServer fileServer;
 
     public ServerSyncProvider(String rootPath)
     {
@@ -80,26 +71,5 @@ public class ServerSyncProvider implements IServersync
         Path get = Paths.get(path);
         FilePacket packet = new FilePacket(get);
         return packet;
-    }
-
-    private void setFileServer(String serverName, int port)
-    {
-
-        try
-        {
-            Registry registry = LocateRegistry.getRegistry(serverName, port);
-            fileServer = (IFileServer) registry.lookup(IFileServer.class.getSimpleName());
-        }
-        catch (RemoteException ex)
-        {
-            fileServer = null;
-            Logger.getLogger(ServerSyncProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (NotBoundException ex)
-        {
-            fileServer = null;
-            Logger.getLogger(ServerSyncProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 }
