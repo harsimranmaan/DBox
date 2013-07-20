@@ -4,6 +4,7 @@
  */
 package dBox;
 
+import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,6 +46,7 @@ public class HashManager
      */
     public HashManager(Path filePath, HashMap<Path, String> fileEvent)
     {
+        CustomLogger.log("HashManager > HashManager : filePath " + filePath.toString() + " fileEvent " + fileEvent);
         this.hashFilePath = filePath.toString();
         this.hashFile = new File(hashFilePath);
         this.fileEvent = fileEvent;

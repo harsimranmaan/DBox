@@ -9,6 +9,7 @@ package dBox;
  * @author harsimran.maan
  * <p/>
  */
+import dBox.utils.CustomLogger;
 import java.io.*;
 import java.nio.file.Path;
 
@@ -34,6 +35,7 @@ public class FilePacket implements Serializable
     {
         try
         {
+            CustomLogger.log("FilePacket > FilePacket : fileName " + fileName.toString());
             File file = fileName.toFile();
             data = new byte[(int) (file.length())];
             FileInputStream fileInputStream = new FileInputStream(file);

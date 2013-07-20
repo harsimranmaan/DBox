@@ -5,6 +5,7 @@
 package dBox.Server;
 
 import dBox.ServerUtils.DataAccess;
+import dBox.utils.CustomLogger;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,7 @@ public class AliveCheck extends Thread
 
     public AliveCheck(String server, int port, int clusterId)
     {
+        CustomLogger.log("AliveCheck > AliveCheck : server " + server + " port " + port + " clusterId " + clusterId);
         this.server = server;
         this.clusterId = clusterId;
         try

@@ -38,6 +38,7 @@ public class ServerSyncChecker extends Thread
 
     public ServerSyncChecker(String myServername, int port)
     {
+        CustomLogger.log("ServerSyncChecker > ServerSyncChecker : myServername " + myServername + " port " + port);
         this.myServername = myServername;
         this.port = port;
         this.peerDetails = new PeerDetailsGetter();
@@ -75,6 +76,7 @@ public class ServerSyncChecker extends Thread
 
     private void copyFile(String path) throws RemoteException
     {
+        CustomLogger.log("ServerSyncChecker > copyFile : path " + path);
         FilePacket packet = syncProvider.getFile(path);
         Path get = Paths.get(path);
         String pathOnServer = get.toString().replaceAll(packet.getName() + "$", "");

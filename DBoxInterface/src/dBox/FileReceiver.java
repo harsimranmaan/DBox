@@ -25,6 +25,7 @@ public class FileReceiver
 
     public FileReceiver(String directory)
     {
+        CustomLogger.log("FileReceiver > FileReceiver : directory " + directory);
         this.directory = directory;
         File theFile = new File(directory);
         theFile.mkdirs();
@@ -34,8 +35,9 @@ public class FileReceiver
     {
         try
         {
+            CustomLogger.log("FileReceiver > receiveFile : path " + path);
             String pathOnServer = directory + File.separator + path;
-            CustomLogger.log("Path on server " + pathOnServer);
+            //  CustomLogger.log("Path on server " + pathOnServer);
             File theFile = new File(pathOnServer);
             theFile.mkdirs();
             pathOnServer += packet.getName();

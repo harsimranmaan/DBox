@@ -4,6 +4,7 @@
  */
 package dBox;
 
+import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,12 +21,12 @@ public class FileDeleter
      * Recursively delete empty directory
      * <p/>
      * @param path
-     * @param upto
-     * <p/>
+     * @param upto <p/>
      * @throws IOException
      */
     public static void delete(Path path, Path upto) throws IOException
     {
+        CustomLogger.log("FileDeleter > delete : path " + path.toString() + " upto " + upto.toString());
         if (path == upto)
         {
             return;

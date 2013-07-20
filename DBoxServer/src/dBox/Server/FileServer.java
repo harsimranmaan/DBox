@@ -41,6 +41,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public void setDirectory(String directory) throws RemoteException
     {
+        CustomLogger.log("FileServer > setDirectory : directory " + directory);
         this.directory = System.getProperty("user.home") + File.separator + ConfigManager.getInstance().getPropertyValue("rootPath") + File.separator + directory;
         this.receiver = new FileReceiver(this.directory);
     }
@@ -60,6 +61,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public ClientAction actionOnModify(String path, String fileHash, String oldHash) throws RemoteException
     {
+        CustomLogger.log("FileServer > ClientAction : path " + path + " fileHash " + fileHash + " oldHash " + oldHash);
         if (path.equals("a.txt"))
         {
             return ClientAction.DOWNLOAD;
@@ -101,6 +103,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException
     {
+        CustomLogger.log("FileServer > ClientAction : path " + path + " oldHash " + oldHash);
         String filePath = this.directory + File.separator + path;
         File theFile = new File(filePath);
         if (!theFile.exists())
@@ -137,6 +140,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public FilePacket download(String path) throws RemoteException
     {
+        CustomLogger.log("FileServer > FilePacket : path " + path);
         Path myPath = Paths.get(this.directory + File.separator + path);
         System.out.println(myPath.toString());
         return new FilePacket(myPath);

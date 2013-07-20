@@ -4,6 +4,7 @@
  */
 package dBox;
 
+import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
 import java.io.File;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ public class FileToucher
 
     public static void touchAllFiles(Path path, HashMap<Path, String> fileEvent, ArrayList<Path> ignorePath, boolean getHash)
     {
-
+        CustomLogger.log("FileToucher > touchAllFiles : path " + path.toString() + " fileEvent " + fileEvent + " ignorePath " + ignorePath);
         File folder = new File(path.toString());
         File[] filelist = folder.listFiles();
         Path filepath;
@@ -56,6 +57,7 @@ public class FileToucher
 
     public static void touchAll(Path path, HashMap<String, String> fileEvent, boolean getHash)
     {
+        CustomLogger.log("FileToucher > touchAll : path " + path.toString() + " fileEvent " + fileEvent);
         System.out.println(path.toString());
 
         File folder = new File(path.toString());

@@ -4,6 +4,7 @@
  */
 package dBox;
 
+import dBox.utils.CustomLogger;
 import java.nio.file.Path;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ public class FileSender extends Thread
 
     public FileSender(IFileServer receiver, String serverPath, Path clientPath)
     {
+        CustomLogger.log("FileSender > FileSender : serverPath " + serverPath + " clientPath " + clientPath.toString());
         this.serverPath = serverPath;
         this.clientFile = clientPath;
         this.receiver = receiver;
