@@ -18,39 +18,43 @@ import java.util.logging.Logger;
 public class PeerDetailsGetter
 {
 
-    public ServerDetails getServerDetails(String myServerName)
+    public PPeerDetailsGetter(String myServerName)
+    {
+        this.myServerName = myServerName;
+    }
+//    public ServerDetails getServerDetails(String myServerName)
+//    {
+//        ServerDetails sDetails;
+//        try
+//        {
+//            ResultSet set = DataAccess.getResultSet("SELECT S.* FROM ServerDetails S, ServerDetails my WHERE my.servername='" + myServerName + "' AND S.servername=my.monitoring AND S.clusterId=my.clusterId ORDER BY serverIndex LIMIT 1");
+//            if (set != null && set.next())
+//            {
+//                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
+//
+//            }
+//            else
+//            {
+//                sDetails = new ServerDetails(myServerName, 0, 0, 0);
+//            }
+//        }
+//        catch (SQLException ex)
+//        {
+//            Logger.getLogger(PeerDetailsGetter.class.getName()).log(Level.SEVERE, null, ex);
+//            sDetails = new ServerDetails(myServerName, 0, 0, 0);
+//        }
+//        return sDetails;
+//    }
+
+    public ServerDetails getMonitorDetails() throws Exception
     {
         ServerDetails sDetails;
         try
         {
-            ResultSet set = DataAccess.getResultSet("SELECT S.* FROM ServerDetails S, ServerDetails my WHERE my.servername='" + myServerName + "' AND S.servername=my.monitoring AND S.clusterId=my.clusterId ORDER BY serverIndex LIMIT 1");
+            ResultSet set = DataAccess.getResultSet("SELECT S.* FROM ServerDetails S, ServerDetails my WHERE S.serverIndex=(SELECT MIN(I.serverIndex) FROM ServerDetails I WHERE I.serverIndex > my.serverIndex AND I.clusterId=my.clusterId) AND my.clusterId=S.clusterId AND my.servername='" + myServerName + "' LIMIT 1");
             if (set != null && set.next())
             {
                 sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
-
-            }
-            else
-            {
-                sDetails = new ServerDetails(myServerName, 0, 0, 0);
-            }
-        }
-        catch (SQLException ex)
-        {
-            Logger.getLogger(PeerDetailsGetter.class.getName()).log(Level.SEVERE, null, ex);
-            sDetails = new ServerDetails(myServerName, 0, 0, 0);
-        }
-        return sDetails;
-    }
-
-    public ServerDetails getMonitorDetails(String myServerName) throws Exception
-    {
-        ServerDetails sDetails;
-        try
-        {
-            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE servername='" + myServerName + "' LIMIT 1");
-            if (set != null && set.next())
-            {
-                sDetails = new ServerDetails(set.getString("monitoring"), set.getInt("portNumber"), set.getInt("clusterId"), set.getInt("serverIndex"));
 
             }
             else

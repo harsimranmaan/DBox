@@ -5,6 +5,7 @@
 package dBox.Server;
 
 import dBox.ServerUtils.DataAccess;
+import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -18,20 +19,18 @@ public class AliveCheck extends Thread
 {
 
     private String server;
-    private final int clusterId;
-    private int serverIndex;
+    //  private final int clusterId;
+    //private int serverIndex;
 
     public AliveCheck(String server, int port, int clusterId)
     {
         CustomLogger.log("AliveCheck > AliveCheck : server " + server + " port " + port + " clusterId " + clusterId);
         this.server = server;
-        this.clusterId = clusterId;
+        // this.clusterId = clusterId;
         try
         {
-            DataAccess.updateOrInsertSingle("DELETE FROM ServerSync WHERE servername='" + server + "'");
+//            DataAccess.updateOrInsertSingle("DELETE FROM ServerSync WHERE servername='" + server + "'");
             DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
-            serverIndex = new PeerDetailsGetter().getServerDetails(server).getServerIndex();
-
 
         }
         catch (SQLException ex)
@@ -59,7 +58,7 @@ public class AliveCheck extends Thread
             }
             try
             {
-                Thread.sleep(5000);
+                Thread.sleep(Integer.parseInt(ConfigManager.getInstance().getPropertyValue("serverPingInterval")));
             }
             catch (InterruptedException ex)
             {

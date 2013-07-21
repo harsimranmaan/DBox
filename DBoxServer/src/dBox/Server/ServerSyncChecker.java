@@ -31,7 +31,7 @@ public class ServerSyncChecker extends Thread
 {
 
     private final String myServername;
-    private final PeerDetailsGetter peerDetails;
+    //   private final PeerDetailsGetter peerDetails;
     private IServersync syncProvider;
     private ServerDetails monitorDetails;
     private final int port;
@@ -41,7 +41,7 @@ public class ServerSyncChecker extends Thread
         CustomLogger.log("ServerSyncChecker > ServerSyncChecker : myServername " + myServername + " port " + port);
         this.myServername = myServername;
         this.port = port;
-        this.peerDetails = new PeerDetailsGetter();
+//        this.peerDetails = new PeerDetailsGetter();
     }
 
     private boolean firstTimeSync() throws Exception
@@ -99,7 +99,7 @@ public class ServerSyncChecker extends Thread
 
     private void setMonitor() throws Exception
     {
-        this.monitorDetails = peerDetails.getMonitorDetails(myServername);
+        //  this.monitorDetails = peerDetails.getMonitorDetails(myServername);
         System.out.println(monitorDetails.getServerName() + " " + myServername);
         setProvider();
     }

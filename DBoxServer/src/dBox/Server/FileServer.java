@@ -10,6 +10,7 @@ import dBox.FileDetail;
 import dBox.FilePacket;
 import dBox.FileReceiver;
 import dBox.IFileServer;
+import dBox.ServerDetails;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
 import dBox.utils.Hashing;
@@ -21,6 +22,8 @@ import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -38,16 +41,20 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     private FileReceiver receiver;
     private String clientBase;
     private String clientSeperator;
+    private PeerDetailsGetter peerDetailsGetter;
+    private String userHash;
 
-    public FileServer() throws RemoteException
+    public FileServer(PeerDetailsGetter peerDetailsGetter) throws RemoteException
     {
         super();
+        this.peerDetailsGetter = peerDetailsGetter;
     }
 
     @Override
     public void setDirectory(String directory, String clientBase, String clientSeperator) throws RemoteException
     {
         CustomLogger.log("FileServer > setDirectory : directory " + directory);
+        this.userHash = directory;
         this.directory = System.getProperty("user.home") + File.separator + ConfigManager.getInstance().getPropertyValue("rootPath") + File.separator + directory;
         this.receiver = new FileReceiver(this.directory);
         this.clientBase = clientBase;
@@ -57,92 +64,27 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     @Override
     public void receiveFile(String path, FilePacket packet) throws RemoteException
     {
+        try
+        {
+            ServerDetails monitor = getMonitor();
+            Registry registry = LocateRegistry.getRegistry(monitor.getServerName(), monitor.getPort());
+            IFileServer monitorReceiver = (IFileServer) registry.lookup(IFileServer.class
+                    .getSimpleName());
+            monitorReceiver.setDirectory(userHash, clientBase, clientSeperator);
+            monitorReceiver.receiveFile(path, packet);
+        }
+        catch (Exception ex)
+        {
+            CustomLogger.log(ex.getMessage());
+        }
         receiver.receiveFile(path, packet);
+
     }
 
     @Override
     public String pathSeperator() throws RemoteException
     {
         return File.separator;
-    }
-
-    @Override
-    public ClientAction actionOnModify(String path, String fileHash, String oldHash) throws RemoteException
-    {
-        CustomLogger.log("FileServer > ClientAction : path " + path + " fileHash " + fileHash + " oldHash " + oldHash);
-        if (path.equals("a.txt"))
-        {
-            return ClientAction.DOWNLOAD;
-        }
-        File theFile = new File(path);
-        if (!theFile.exists())
-        {
-            if (fileHash.equals(oldHash))
-            {
-                return ClientAction.DELETE;
-            }
-            else
-            {
-                return ClientAction.UPLOAD;
-            }
-        }
-        else
-        {
-            String serverHash = Hashing.getSHAChecksum(this.directory + File.separator + path);
-            CustomLogger.log("On Server hash " + serverHash);
-            if (serverHash.equals(fileHash))
-            {
-                return ClientAction.NOTHING;
-            }
-            else
-            {
-                if (serverHash.equals(oldHash))
-                {
-                    return ClientAction.UPLOAD;
-                }
-                else
-                {
-                    return ClientAction.CONFLICT;
-                }
-            }
-        }
-    }
-
-    @Override
-    public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException
-    {
-        CustomLogger.log("FileServer > ClientAction : path " + path + " oldHash " + oldHash);
-        String filePath = this.directory + File.separator + path;
-        File theFile = new File(filePath);
-        if (!theFile.exists())
-        {
-            return ClientAction.NOTHING;
-        }
-        else
-        {
-
-
-            String serverHash = Hashing.getSHAChecksum(filePath);
-            System.out.println("s" + serverHash + " o " + oldHash);
-            if (serverHash.equals(oldHash))
-            {
-                try
-                {
-                    //remove file
-                    CustomLogger.log("Deleting " + filePath);
-                    FileDeleter.delete(Paths.get(filePath), Paths.get(this.directory));
-                }
-                catch (IOException ex)
-                {
-                    Logger.getLogger(FileServer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return ClientAction.NOTHING;
-            }
-            else
-            {
-                return ClientAction.DOWNLOAD;
-            }
-        }
     }
 
     @Override
@@ -186,12 +128,18 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
                     CustomLogger.log("Deleting " + serverPath);
                     try
                     {
-                        FileDeleter.delete(Paths.get(serverPath), Paths.get(this.directory));
+                        ServerDetails monitor = getMonitor();
+                        Registry registry = LocateRegistry.getRegistry(monitor.getServerName(), monitor.getPort());
+                        IFileServer monitorReceiver = (IFileServer) registry.lookup(IFileServer.class
+                                .getSimpleName());
+                        monitorReceiver.setDirectory(userHash, clientBase, clientSeperator);
+                        monitorReceiver.delete(serverPath, directory);
                     }
-                    catch (IOException ex)
+                    catch (Exception ex)
                     {
-                        Logger.getLogger(FileServer.class.getName()).log(Level.SEVERE, null, ex);
+                        CustomLogger.log(ex.getMessage());
                     }
+                    delete(serverPath, directory);
                 }
                 else
                 {
@@ -265,6 +213,24 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
                     clientActions.put(clientPath, ClientAction.DOWNLOAD);
                 }
             }
+        }
+    }
+
+    private ServerDetails getMonitor() throws Exception
+    {
+        return peerDetailsGetter.getMonitorDetails();
+    }
+
+    @Override
+    public void delete(String serverPath, String upto) throws RemoteException
+    {
+        try
+        {
+            FileDeleter.delete(Paths.get(serverPath), Paths.get(upto));
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(FileServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

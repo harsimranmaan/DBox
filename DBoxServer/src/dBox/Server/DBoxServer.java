@@ -56,10 +56,10 @@ public class DBoxServer
             int clusterId = Integer.parseInt(context.getPropertyValue("clusterId"));
             CustomLogger.log("Starting server " + server + " on port " + port + " on cluster " + clusterId);
             Registry registry = LocateRegistry.createRegistry(port);
-            registry.rebind(IFileServer.class.getSimpleName(), new FileServer());
+            registry.rebind(IFileServer.class.getSimpleName(), new FileServer(new PeerDetailsGetter(server)));
             CustomLogger.log("Bound " + IFileServer.class.getSimpleName());
-            registry.rebind(IServersync.class.getSimpleName(), new ServerSyncProvider(System.getProperty("user.home") + File.separator + context.getPropertyValue("rootPath")));
-            CustomLogger.log("Bound " + IServersync.class.getSimpleName());
+//            registry.rebind(IServersync.class.getSimpleName(), new ServerSyncProvider(System.getProperty("user.home") + File.separator + context.getPropertyValue("rootPath")));
+//            CustomLogger.log("Bound " + IServersync.class.getSimpleName());
 
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
             new AliveCheck(server, port, clusterId).start();

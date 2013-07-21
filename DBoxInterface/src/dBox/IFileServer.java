@@ -35,7 +35,7 @@ public interface IFileServer extends Remote
      */
     public void receiveFile(String path, FilePacket packet) throws RemoteException;
 
-    public FilePacket download(String path) throws RemoteException;
+    FilePacket download(String path) throws RemoteException;
 
     /**
      * Get the server path separator
@@ -44,28 +44,9 @@ public interface IFileServer extends Remote
      * <p/>
      * @throws RemoteException
      */
-    public String pathSeperator() throws RemoteException;
+    String pathSeperator() throws RemoteException;
 
-    /**
-     * Tells what action to perform
-     * <p/>
-     * @param path
-     * @param fileHash
-     * @param oldHash  <p/>
-     * @return <p/>
-     * @throws RemoteException
-     */
-    public ClientAction actionOnModify(String path, String fileHash, String oldHash) throws RemoteException;
-
-    /**
-     * Tells what action to perform if a file on client is deleted
-     * <p/>
-     * @param path
-     * @param oldHash <p/>
-     * @return <p/>
-     * @throws RemoteException
-     */
-    public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException;
+    void delete(String path, String upto) throws RemoteException;
 
     HashMap<String, ClientAction> getClientActions(HashMap<String, FileDetail> currentFiles, HashMap<String, FileDetail> deletedFiles) throws RemoteException;
 }

@@ -5,6 +5,7 @@
 package dBox.Broker;
 
 import dBox.ServerUtils.DataAccess;
+import dBox.utils.ConfigManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +20,7 @@ public class FileServerMonitor extends Thread
     @Override
     public void run()
     {
-        int timeout = 7;
+        int timeout = 25;
         while (true)
         {
             try
@@ -32,7 +33,7 @@ public class FileServerMonitor extends Thread
             }
             try
             {
-                Thread.sleep(4000);
+                Thread.sleep(Integer.parseInt(ConfigManager.getInstance().getPropertyValue("brokerInterval")));
             }
             catch (InterruptedException ex)
             {
