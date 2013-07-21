@@ -18,7 +18,9 @@ import java.util.logging.Logger;
 public class PeerDetailsGetter
 {
 
-    public PPeerDetailsGetter(String myServerName)
+    private final String myServerName;
+
+    public PeerDetailsGetter(String myServerName)
     {
         this.myServerName = myServerName;
     }
