@@ -7,8 +7,6 @@ package dBox.Client;
 import dBox.IAuthentication;
 import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
-import dBox.utils.ConfigManager;
-import java.rmi.RemoteException;
 
 /**
  * gives the server detail to the client upon request

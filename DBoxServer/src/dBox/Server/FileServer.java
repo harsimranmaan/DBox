@@ -158,7 +158,7 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     {
         path = path.replace(clientBase, directory);
         path = path.replace(clientSeperator, File.separator);
-        CustomLogger.log("While processing server path " + path);
+        CustomLogger.log("Processing on server path " + path);
         return path;
     }
 

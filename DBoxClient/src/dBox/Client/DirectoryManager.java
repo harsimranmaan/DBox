@@ -47,9 +47,7 @@ public class DirectoryManager extends Thread
 
     private IServerDetailsGetter serverDetailsGetter;
     private ConfigManager config;
-    // private HashMap<Path, String> fileCurrentHash;
     private HashMap<String, FileDetail> currentFileHashes;
-    // private WatchDir dirWatcher;
     private boolean keepProcessing;
     private Path folder;
     private IFileServer receiver;
@@ -124,11 +122,20 @@ public class DirectoryManager extends Thread
                             break;
                     }
                 }
-                Thread.sleep(10000);
             }
             catch (Exception ex)
             {
                 CustomLogger.log(ex.getMessage());
+            }
+            finally
+            {
+                try
+                {
+                    Thread.sleep(Integer.parseInt(config.getPropertyValue("pollInterval")));
+                }
+                catch (InterruptedException ex)
+                {
+                }
             }
         }
     }
@@ -143,6 +150,8 @@ public class DirectoryManager extends Thread
         FilePacket download = receiver.download(getServerPathFull(path));
         try
         {
+            File theDirCheck = path.getParent().toFile();
+            theDirCheck.mkdirs();
             OutputStream out = new FileOutputStream(path.toString());
             download.copy(out);
         }
@@ -191,15 +200,12 @@ public class DirectoryManager extends Thread
      */
     public void stopMonitor()
     {
-
-//        dirWatcher.interrupt();
         keepProcessing = false;
     }
 
     @Override
     public void run()
     {
-        //      this.dirWatcher.start();
         startMonitor();
     }
 
@@ -211,7 +217,7 @@ public class DirectoryManager extends Thread
      */
     private String getServerPath(Path child)
     {
-        // String serverpath = getServerPathFull(child).replaceAll(child.getFileName() + "$", "");
+
         String serverpath = child.toString().replace(folder + File.separator, "").replaceAll(child.getFileName() + "$", "");
         try
         {
