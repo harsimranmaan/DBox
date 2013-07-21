@@ -5,6 +5,7 @@
 package dBox;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Class represents the server property
@@ -19,6 +20,7 @@ public class ServerDetails implements Serializable
     private int port;
     private int clusterId;
     private final int serverIndex;
+    private Date pingTime;
 
     /**
      * initiates the server name and port
@@ -32,6 +34,7 @@ public class ServerDetails implements Serializable
         this.port = port;
         this.clusterId = clusterId;
         this.serverIndex = serverIndex;
+        pingTime = new Date();
     }
 
     /**
@@ -48,6 +51,16 @@ public class ServerDetails implements Serializable
     public int getPort()
     {
         return port;
+    }
+
+    public void ping()
+    {
+        this.pingTime = new Date();
+    }
+
+    public boolean isTimedOut(int timeout)
+    {
+        return new Date().getTime() - pingTime.getTime() > timeout;
     }
 
     /**

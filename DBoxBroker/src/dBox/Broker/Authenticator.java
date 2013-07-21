@@ -16,6 +16,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,14 +29,18 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
 {
 
     private static final long serialVersionUID = 2222L;
+    private final ServerChecker checker;
+    private final ConfigManager config;
 
     /**
      *
      * @throws RemoteException
      */
-    public Authenticator() throws RemoteException
+    public Authenticator(ServerChecker checker, ConfigManager config) throws RemoteException
     {
         super();
+        this.checker = checker;
+        this.config = config;
     }
 
     @Override
@@ -105,7 +111,6 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     @Override
     public ServerDetails getServerDetails(int clusterId) throws RemoteException
     {
-        ConfigManager config = ConfigManager.getInstance();
         String server = config.getPropertyValue("localserver");
         int port = Integer.parseInt(config.getPropertyValue("serverPort"));
         ServerDetails primaryServer = getPrimaryServer(server, port, clusterId);
@@ -114,26 +119,18 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
 
     }
 
-    private ServerDetails getPrimaryServer(String defaultServer, int port, int clusterId)
+    private synchronized ServerDetails getPrimaryServer(String defaultServer, int port, int clusterId)
     {
-        ServerDetails sDetails;
-        try
+        ServerDetails sDetails = new ServerDetails(defaultServer, port, clusterId, 0);
+        HashMap<String, ServerDetails> serverDetails = checker.getServerDetails();
+        int minimum = 1000000;
+        for (ServerDetails server : serverDetails.values())
         {
-            ResultSet set = DataAccess.getResultSet("SELECT * FROM ServerDetails WHERE clusterId = " + clusterId + " ORDER BY serverIndex LIMIT 1");
-            if (set != null && set.next())
+            if (server.getClusterId() == clusterId && minimum > server.getServerIndex())
             {
-                sDetails = new ServerDetails(set.getString("servername"), set.getInt("portNumber"), set.getInt("clusterId"), 0);
+                minimum = server.getServerIndex();
+                sDetails = server;
             }
-            else
-            {
-                sDetails = new ServerDetails(defaultServer, port, clusterId, 0);
-            }
-            return sDetails;
-        }
-        catch (SQLException ex)
-        {
-            Logger.getLogger(Authenticator.class.getName()).log(Level.SEVERE, null, ex);
-            sDetails = new ServerDetails(defaultServer, port, clusterId, 0);
         }
         return sDetails;
     }

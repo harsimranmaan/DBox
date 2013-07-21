@@ -46,7 +46,23 @@ public interface IFileServer extends Remote
      */
     String pathSeperator() throws RemoteException;
 
+    /**
+     *
+     * @param path
+     * @param upto
+     * <p/>
+     * @throws RemoteException
+     */
     void delete(String path, String upto) throws RemoteException;
 
+    /**
+     *
+     * @param currentFiles
+     * @param deletedFiles
+     * <p/>
+     * @return
+     * <p/>
+     * @throws RemoteException
+     */
     HashMap<String, ClientAction> getClientActions(HashMap<String, FileDetail> currentFiles, HashMap<String, FileDetail> deletedFiles) throws RemoteException;
 }

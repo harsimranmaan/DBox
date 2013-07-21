@@ -4,7 +4,6 @@
  */
 package dBox;
 
-import dBox.utils.CustomLogger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,10 +43,10 @@ public class HashManager
      */
     public HashManager(Path filePath)
     {
-        CustomLogger.log("HashManager > HashManager : filePath " + filePath.toString());
+
         this.hashFilePath = filePath.toString();
         this.hashFile = new File(hashFilePath);
-        //      this.fileEvent = fileEvent;
+
         lastKnownServerHashes = new HashMap<>();
         if (hashFile.exists())
         {
@@ -67,14 +66,6 @@ public class HashManager
             lastKnownServerHashes = (HashMap<String, String>) ois.readObject();
             ois.close();
             fis.close();
-//            for (String key : lastKnownServerHashes.keySet())
-//            {
-//                Path path = Paths.get(key);
-//                if (!Files.exists(path))
-//                {
-//                    fileEvent.put(Paths.get(key), "ENTRY_DELETED");
-//                }
-//            }
         }
         catch (IOException ex)
         {

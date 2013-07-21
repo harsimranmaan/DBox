@@ -5,8 +5,10 @@
 package dBox.Server;
 
 import dBox.ServerUtils.DataAccess;
+import dBox.ServerUtils.IServerChecker;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,23 +23,24 @@ public class AliveCheck extends Thread
     private String server;
     //  private final int clusterId;
     //private int serverIndex;
+    private final IServerChecker checker;
+    private final int port;
+    private final int clusterId;
+    private final ConfigManager config;
 
-    public AliveCheck(String server, int port, int clusterId)
+    AliveCheck(IServerChecker checker, ConfigManager config, String server, int port, int clusterId)
     {
-        CustomLogger.log("AliveCheck > AliveCheck : server " + server + " port " + port + " clusterId " + clusterId);
+        this.checker = checker;
         this.server = server;
-        // this.clusterId = clusterId;
+        this.port = port;
+        this.clusterId = clusterId;
+        this.config = config;
+        CustomLogger.log("AliveCheck > AliveCheck : server " + server + " port " + port + " clusterId " + clusterId);
         try
         {
-//            DataAccess.updateOrInsertSingle("DELETE FROM ServerSync WHERE servername='" + server + "'");
-            DataAccess.updateOrInsertSingle("INSERT INTO ServerDetails VALUES('" + server + "'," + port + ",(SELECT m FROM (SELECT IFNULL(MAX(serverIndex),0)+1 AS m FROM ServerDetails WHERE clusterId = " + clusterId + " ) AS M), now()," + clusterId + ",(SELECT m FROM(SELECT servername as m FROM ServerDetails WHERE clusterId = " + clusterId + " AND serverIndex= (SELECT MAX(serverIndex) FROM ServerDetails WHERE clusterId =  " + clusterId + ") ) AS M))");
-
+            checker.ping(server, port, clusterId);
         }
-        catch (SQLException ex)
-        {
-            Logger.getLogger(AliveCheck.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (Exception ex)
+        catch (RemoteException ex)
         {
             Logger.getLogger(AliveCheck.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -49,16 +52,16 @@ public class AliveCheck extends Thread
         {
             try
             {
-                DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET lastCheck=now() WHERE servername='" + server + "'");
-                //  DataAccess.updateOrInsertSingle("UPDATE ServerDetails SET monitoring = (SELECT m FROM(SELECT MAX(sd.serverIndex) as m from ServerDetails sd where sd.clusterId =" + clusterId + " AND sd.serverIndex < " + serverIndex + ") AS M) WHERE servername = '" + server + "' AND monitoring IS NULL");
+                checker.ping(server, port, clusterId);
             }
-            catch (SQLException ex)
+            catch (RemoteException ex)
             {
                 Logger.getLogger(AliveCheck.class.getName()).log(Level.SEVERE, null, ex);
             }
+
             try
             {
-                Thread.sleep(Integer.parseInt(ConfigManager.getInstance().getPropertyValue("serverPingInterval")));
+                Thread.sleep(Integer.parseInt(config.getPropertyValue("serverPingInterval")));
             }
             catch (InterruptedException ex)
             {

@@ -4,9 +4,11 @@
  */
 package dBox.Broker;
 
+import dBox.ServerDetails;
 import dBox.ServerUtils.DataAccess;
 import dBox.utils.ConfigManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,23 +19,39 @@ import java.util.logging.Logger;
 public class FileServerMonitor extends Thread
 {
 
+    private final ServerChecker checker;
+    private final ConfigManager config;
+
+    public FileServerMonitor(ServerChecker checker, ConfigManager config)
+    {
+        this.checker = checker;
+        this.config = config;
+    }
+
     @Override
     public void run()
     {
-        int timeout = 33;
+        int timeout = Integer.parseInt(config.getPropertyValue("serverTimeout"));
         while (true)
         {
             try
             {
-                DataAccess.updateOrInsertSingle("DELETE FROM ServerDetails WHERE now()-lastCheck > " + timeout);
+                HashMap<String, ServerDetails> serverDetails = checker.getServerDetails();
+                for (ServerDetails server : serverDetails.values())
+                {
+                    if (server.isTimedOut(timeout))
+                    {
+                        serverDetails.remove(server.getServerName());
+                    }
+                }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 Logger.getLogger(FileServerMonitor.class.getName()).log(Level.SEVERE, null, ex);
             }
             try
             {
-                Thread.sleep(Integer.parseInt(ConfigManager.getInstance().getPropertyValue("brokerInterval")));
+                Thread.sleep(Integer.parseInt(config.getPropertyValue("brokerInterval")));
             }
             catch (InterruptedException ex)
             {

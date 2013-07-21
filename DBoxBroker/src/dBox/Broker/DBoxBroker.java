@@ -6,6 +6,7 @@ package dBox.Broker;
 
 import dBox.IAuthentication;
 import dBox.ServerUtils.DataAccess;
+import dBox.ServerUtils.IServerChecker;
 import dBox.ServerUtils.MetaData;
 import dBox.utils.ConfigManager;
 import dBox.utils.CustomLogger;
@@ -53,11 +54,14 @@ public class DBoxBroker
             String port = context.getPropertyValue("port");
             CustomLogger.log("Starting server " + server + " on port " + port);
             Registry registry = LocateRegistry.createRegistry(Integer.parseInt(port));
-            registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator());
+            ServerChecker checker = new ServerChecker();
+            registry.rebind(IAuthentication.class.getSimpleName(), new Authenticator(checker, context));
             CustomLogger.log("Bound " + IAuthentication.class.getSimpleName());
 
+            registry.rebind(IServerChecker.class.getSimpleName(), checker);
+            CustomLogger.log("Bound " + IServerChecker.class.getSimpleName());
             DataAccess.init(context.getPropertyValue("dbConnection"), context.getPropertyValue("dbUserId"), context.getPropertyValue("dbUserToken"));
-            new FileServerMonitor().start();
+            new FileServerMonitor(checker, context).start();
             System.out.println("Broker started");
         }
         catch (RemoteException ex)
