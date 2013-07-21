@@ -4,46 +4,39 @@
  */
 package dBox;
 
-import java.io.File;
+import java.io.Serializable;
 
 /**
  * File details
  * <p/>
  * @author Kuntal
  */
-public class FileDetail
+public class FileDetail implements Serializable
 {
 
-    private File synchFile;
+    private String oldHash;
     private String fileHash;
 
-    public FileDetail(File file, String hash)
+    public FileDetail(String oldHash, String newHash)
     {
-        this.synchFile = file;
-        this.fileHash = hash;
+        this.oldHash = oldHash;
+        this.fileHash = newHash;
 
     }
 
     /**
      * @return the synchFile
      */
-    public File getSynchFile()
+    public String getOldHash()
     {
-        return synchFile;
-    }
+        return oldHash;
 
-    /**
-     * @param synchFile the synchFile to set
-     */
-    public void setSynchFile(File synchFile)
-    {
-        this.synchFile = synchFile;
     }
 
     /**
      * @return the fileHash
      */
-    public String getFileHash()
+    public String getNewHash()
     {
         return fileHash;
     }

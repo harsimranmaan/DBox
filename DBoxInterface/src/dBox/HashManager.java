@@ -11,9 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +34,7 @@ public class HashManager
 
     private File hashFile;
     private HashMap<String, String> lastKnownServerHashes;
-    private HashMap<Path, String> fileEvent;
+    //   private HashMap<Path, String> fileEvent;
     private String hashFilePath;
 
     /**
@@ -44,12 +42,12 @@ public class HashManager
      * @param filePath
      * @param fileEvent
      */
-    public HashManager(Path filePath, HashMap<Path, String> fileEvent)
+    public HashManager(Path filePath)
     {
-        CustomLogger.log("HashManager > HashManager : filePath " + filePath.toString() + " fileEvent " + fileEvent);
+        CustomLogger.log("HashManager > HashManager : filePath " + filePath.toString());
         this.hashFilePath = filePath.toString();
         this.hashFile = new File(hashFilePath);
-        this.fileEvent = fileEvent;
+        //      this.fileEvent = fileEvent;
         lastKnownServerHashes = new HashMap<>();
         if (hashFile.exists())
         {
@@ -155,5 +153,19 @@ public class HashManager
     public String getHashFilePath()
     {
         return hashFilePath;
+    }
+
+    public HashMap<String, FileDetail> getDeletedFiles(HashMap<String, FileDetail> currentFileHashes)
+    {
+        HashMap<String, FileDetail> deleted = new HashMap<>();
+
+        for (String key : lastKnownServerHashes.keySet())
+        {
+            if (!currentFileHashes.containsKey(key))
+            {
+                deleted.put(key, new FileDetail(lastKnownServerHashes.get(key), ""));
+            }
+        }
+        return deleted;
     }
 }

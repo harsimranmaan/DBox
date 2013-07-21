@@ -41,7 +41,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     public ClientDetails authenticate(String userName, String password) throws RemoteException
     {
         ClientDetails client;
-        CustomLogger.log("Auth user " + userName);
+        CustomLogger.log("Authenticator > authenticate: userName " + userName);
         if (userName.matches("[a-zA-Z0-9]+") && password.matches("[a-zA-Z0-9]+"))
         {
 
@@ -74,7 +74,7 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
     public ClientDetails authenticate(String hash) throws RemoteException
     {
         ClientDetails client;
-        CustomLogger.log("Auth hash " + hash);
+        CustomLogger.log("Authenticator > authenticate: hash " + hash);
         if (hash.matches("[a-zA-Z0-9]+"))
         {
             try
@@ -108,7 +108,9 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         ConfigManager config = ConfigManager.getInstance();
         String server = config.getPropertyValue("localserver");
         int port = Integer.parseInt(config.getPropertyValue("serverPort"));
-        return getPrimaryServer(server, port, clusterId);
+        ServerDetails primaryServer = getPrimaryServer(server, port, clusterId);
+        CustomLogger.log("Authenticator > getServerDetails: Primary server " + primaryServer.getServerName());
+        return primaryServer;
 
     }
 

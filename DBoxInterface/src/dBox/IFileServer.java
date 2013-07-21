@@ -6,6 +6,7 @@ package dBox;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 /**
  *
@@ -22,7 +23,7 @@ public interface IFileServer extends Remote
      * @exception RemoteException to remote object
      * <p/>
      */
-    public void setDirectory(String directory) throws RemoteException;
+    public void setDirectory(String directory, String clientBase, String clientSeperator) throws RemoteException;
 
     /**
      * Receive a file from a remote source
@@ -65,4 +66,6 @@ public interface IFileServer extends Remote
      * @throws RemoteException
      */
     public ClientAction actionOnDelete(String path, String oldHash) throws RemoteException;
+
+    HashMap<String, ClientAction> getClientActions(HashMap<String, FileDetail> currentFiles, HashMap<String, FileDetail> deletedFiles) throws RemoteException;
 }
