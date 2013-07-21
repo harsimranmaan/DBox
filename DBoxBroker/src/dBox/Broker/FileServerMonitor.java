@@ -20,7 +20,7 @@ public class FileServerMonitor extends Thread
     @Override
     public void run()
     {
-        int timeout = 25;
+        int timeout = 33;
         while (true)
         {
             try

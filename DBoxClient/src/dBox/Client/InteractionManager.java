@@ -27,7 +27,6 @@ class InteractionManager
     private ClientDetails client;
     private DirectoryManager directoryWatch;
     private ConfigManager config;
-//    private IFileReceiver receiver;
 
     /**
      * Handles Interaction with the User
@@ -42,7 +41,7 @@ class InteractionManager
         System.out.println("------------------------------------------------------");
         System.out.println("|             Welcome to DbLike                      |");
         System.out.println("------------------------------------------------------");
-        System.out.println("");
+        System.out.println("             Use help for options                     ");
         //try authentication
         try
         {
@@ -135,24 +134,6 @@ class InteractionManager
         config.setPropertyValue("hash", client.getUserhash());
         config.setPropertyValue("user", client.getUsername());
         config.setPropertyValue("clusterId", Integer.toString(client.getClusterId()));
-//        try
-//        {
-//            ServerDetails serverDetails = authentication.getServerDetails();
-//            CustomLogger.log("Server " + serverDetails.getServerName() + " Port " + serverDetails.getPort());
-//            Registry registry = LocateRegistry.getRegistry(serverDetails.getServerName(), serverDetails.getPort());
-//            //          receiver = (IFileReceiver) registry.lookup(IFileReceiver.class.getSimpleName());
-//            //        receiver.setDirectory(client.getUserhash());
-//        }
-//        catch (RemoteException ex)
-//        {
-//            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        catch (NotBoundException ex)
-//        {
-//            Logger.getLogger(InteractionManager.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
-
 
     }
 
@@ -218,15 +199,22 @@ class InteractionManager
                 switch (commandString[0])
                 {
                     case "login":
-                        if (commandString.length == 3)
+                        if (!isLoggedIn())
                         {
-                            login(commandString[1], commandString[2]);
+                            if (commandString.length == 3)
+                            {
+                                login(commandString[1], commandString[2]);
+                                printMessage("Please set the directory using the dir command.");
+                            }
+                            else
+                            {
+                                printWarning(commandString[0]);
+                            }
                         }
                         else
                         {
-                            printWarning(commandString[0]);
+                            printMessage("Already logged in");
                         }
-
                         break;
                     case "help":
                         if (commandString.length == 1)
@@ -237,13 +225,20 @@ class InteractionManager
                     case "dir":
                         if (commandString.length == 2)
                         {
-                            String path = commandString[1];
-                            if (folderExists(path))
+                            if (isLoggedIn())
                             {
-                                CustomLogger.log("Monitoring " + commandString[1]);
-                                config.setPropertyValue("folder", commandString[1]);
-                                setUpDirectoryMonitor();
+                                String path = commandString[1];
+                                if (folderExists(path))
+                                {
+                                    CustomLogger.log("Monitoring " + commandString[1]);
+                                    config.setPropertyValue("folder", commandString[1]);
+                                    setUpDirectoryMonitor();
 
+                                }
+                            }
+                            else
+                            {
+                                printWarning("Please login before setting the directory");
                             }
                         }
                         else
@@ -251,6 +246,13 @@ class InteractionManager
                             System.out.println("Wrong input.");
                             printPrompt();
                         }
+                        break;
+                    case "logout":
+                        client = null;
+                        stopFolderMonitor();
+                        config.setPropertyValue("hash", "none");
+                        config.setPropertyValue("user", "none");
+                        config.setPropertyValue("folder", "none");
                         break;
                     case "quit":
                         client = null;
@@ -287,8 +289,11 @@ class InteractionManager
         if (isLoggedIn())
         {
             System.out.println("|              dir <directory path>             |");
-            System.out.println("| Eg.              dir D:\\bla                  |");
-            System.out.println("|                                              |");
+            System.out.println("| Eg.              dir D:\\somePath             |");
+            System.out.println("|                                               |");
+
+            System.out.println("|                  logout                       |");
+            System.out.println("|                                               |");
 
             System.out.println("|                                              |");
             System.out.println("|                    quit                      |");
@@ -312,45 +317,7 @@ class InteractionManager
         }
         System.out.print(prompt);
         scanIn = new Scanner(System.in);
-        String input = scanIn.nextLine().trim();//.toLowerCase();
+        String input = scanIn.nextLine().trim();
         return input;
-    }
-
-    /**
-     * gets the balance value in double for the given string
-     * <p/>
-     * @param bal <p/>
-     * @return balance in double format
-     * <p/>
-     * @throws NumberFormatException
-     */
-    private double getInputAmount(String bal) throws NumberFormatException
-    {
-
-        //check if a  valid decimal
-        if (!bal.matches("^\\d+$|^[.]?\\d{1,2}$|^\\d+[.]?\\d{1,2}$"))
-        {
-            throw new NumberFormatException("Invalid entry");
-        }
-        return Double.valueOf(bal);
-    }
-
-    /**
-     * get the integer value of the given string
-     * <p/>
-     * @param strInt <p/>
-     * @return string in integer format
-     * <p/>
-     * @throws NumberFormatException
-     */
-    private int getInteger(String strInt) throws NumberFormatException
-    {
-
-        //check if a  valid decimal
-        if (!strInt.matches("^[0-9]+$"))
-        {
-            throw new NumberFormatException("Invalid entry");
-        }
-        return Integer.valueOf(strInt);
     }
 }
