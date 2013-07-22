@@ -2,7 +2,7 @@ DBox
 ====
 
 Build:
-Modify the config.properties file for each project to set custom behaviour. SET debug-true to run the solution on the localmachine and for connections to locahost.
+Modify the config.properties file for each project to set custom behaviour. SET debug=true to run the solution on the localmachine and for connections to locahost.
 
 
 At the root direcory use
