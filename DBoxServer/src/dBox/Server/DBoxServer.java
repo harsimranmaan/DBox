@@ -22,7 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * The class to configure the server property and initiates the server tasks
+ * <p/>
  * @author harsimran.maan
  */
 public class DBoxServer

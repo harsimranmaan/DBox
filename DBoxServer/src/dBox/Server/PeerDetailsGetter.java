@@ -18,6 +18,13 @@ public class PeerDetailsGetter
     private final IServerChecker checker;
     private final int clusterId;
 
+    /**
+     * Initiates the peerDetailsGetter properties
+     * <p/>
+     * @param server
+     * @param checker
+     * @param clusterId
+     */
     PeerDetailsGetter(String server, IServerChecker checker, int clusterId)
     {
         this.checker = checker;
@@ -25,6 +32,13 @@ public class PeerDetailsGetter
         this.clusterId = clusterId;
     }
 
+    /**
+     * To get the monitor server details
+     * <p/>
+     * @return server details
+     * <p/>
+     * @throws Exception
+     */
     public ServerDetails getMonitorDetails() throws Exception
     {
         return checker.getMonitor(myServerName, clusterId);

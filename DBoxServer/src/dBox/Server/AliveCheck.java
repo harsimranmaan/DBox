@@ -14,7 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * The class to start the heart beat of the server
+ * <p/>
  * @author harsimran.maan
  */
 public class AliveCheck extends Thread
@@ -28,6 +29,15 @@ public class AliveCheck extends Thread
     private final int clusterId;
     private final ConfigManager config;
 
+    /**
+     * Initiates the AliveCkeck properties
+     * <p/>
+     * @param checker
+     * @param config
+     * @param server
+     * @param port
+     * @param clusterId
+     */
     AliveCheck(IServerChecker checker, ConfigManager config, String server, int port, int clusterId)
     {
         this.checker = checker;
@@ -46,6 +56,9 @@ public class AliveCheck extends Thread
         }
     }
 
+    /**
+     * The function is to start sending the heart beat
+     */
     private void startHeartbeat()
     {
         while (true)
@@ -70,6 +83,9 @@ public class AliveCheck extends Thread
         }
     }
 
+    /**
+     * Thread to start the heart beat
+     */
     @Override
     public void run()
     {

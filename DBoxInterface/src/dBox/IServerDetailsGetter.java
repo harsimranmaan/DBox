@@ -5,7 +5,8 @@
 package dBox;
 
 /**
- *
+ * Interface to get the server details
+ * <p/>
  * @author harsimran.maan
  */
 public interface IServerDetailsGetter

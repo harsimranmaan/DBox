@@ -30,7 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * The class to handle server side files and directories
+ * <p/>
  * @author harsimran.maan
  */
 public class FileServer extends UnicastRemoteObject implements IFileServer, Serializable
@@ -44,12 +45,26 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
     private PeerDetailsGetter peerDetailsGetter;
     private String userHash;
 
+    /**
+     * Set the peerDetailsGetter
+     * <p/>
+     * @param peerDetailsGetter <p/>
+     * @throws RemoteException
+     */
     public FileServer(PeerDetailsGetter peerDetailsGetter) throws RemoteException
     {
         super();
         this.peerDetailsGetter = peerDetailsGetter;
     }
 
+    /**
+     * sets the directory path on the server
+     * <p/>
+     * @param directory
+     * @param clientBase
+     * @param clientSeperator <p/>
+     * @throws RemoteException
+     */
     @Override
     public void setDirectory(String directory, String clientBase, String clientSeperator) throws RemoteException
     {
@@ -61,6 +76,13 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         this.clientSeperator = clientSeperator;
     }
 
+    /**
+     * The function to receive the file on the server
+     * <p/>
+     * @param path
+     * @param packet <p/>
+     * @throws RemoteException
+     */
     @Override
     public void receiveFile(String path, FilePacket packet) throws RemoteException
     {
@@ -81,12 +103,26 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
 
     }
 
+    /**
+     * The function to separate the file path
+     * <p/>
+     * @return <p/>
+     * @throws RemoteException
+     */
     @Override
     public String pathSeperator() throws RemoteException
     {
         return File.separator;
     }
 
+    /**
+     * The function is to download the packet of the file
+     * <p/>
+     * @param path <p/>
+     * @return downloading packet
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public FilePacket download(String path) throws RemoteException
     {
@@ -96,6 +132,12 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         return new FilePacket(myPath);
     }
 
+    /**
+     * The function to get the file path of the server
+     * <p/>
+     * @param path <p/>
+     * @return server path
+     */
     private String getServerPath(String path)
     {
         path = path.replace(clientBase, directory);
@@ -104,6 +146,12 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         return path;
     }
 
+    /**
+     * The function is to get the client file path
+     * <p/>
+     * @param serverPath <p/>
+     * @return client path
+     */
     private String getClientPath(Path serverPath)
     {
         String clientPth = serverPath.toString().replace(directory, clientBase);
@@ -112,6 +160,15 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         return clientPth;
     }
 
+    /**
+     * The function to receive the client side file events
+     * <p/>
+     * @param currentFiles
+     * @param deletedFiles <p/>
+     * @return the hash map with path and client action
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public HashMap<String, ClientAction> getClientActions(HashMap<String, FileDetail> currentFiles, HashMap<String, FileDetail> deletedFiles) throws RemoteException
     {
@@ -191,6 +248,13 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         return clientActions;
     }
 
+    /**
+     * The function to touch all the files of the directory
+     * <p/>
+     * @param path
+     * @param clientActions
+     * @param clientList
+     */
     private void touchAllFiles(Path path, HashMap<String, ClientAction> clientActions, HashMap<String, FileDetail> clientList)
     {
 
@@ -216,11 +280,26 @@ public class FileServer extends UnicastRemoteObject implements IFileServer, Seri
         }
     }
 
+    /**
+     * Get the monitor details
+     * <p/>
+     * @return monitor server details
+     * <p/>
+     * @throws Exception
+     */
     private ServerDetails getMonitor() throws Exception
     {
         return peerDetailsGetter.getMonitorDetails();
     }
 
+    /**
+     * To delete the file from the server
+     * <p/>
+     * @param serverPath
+     * @param upto
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public void delete(String serverPath, String upto) throws RemoteException
     {

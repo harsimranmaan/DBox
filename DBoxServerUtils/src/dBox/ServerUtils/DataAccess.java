@@ -41,9 +41,6 @@ public class DataAccess
 
     /**
      * Creates a connection to the database
-     * <p/>
-     * <
-     * p/>
      */
     public static void Connect()
     {
@@ -78,11 +75,21 @@ public class DataAccess
         }
     }
 
+    /**
+     * Commits the work
+     * <p/>
+     * @throws SQLException
+     */
     public static void commit() throws SQLException
     {
         conn.commit();
     }
 
+    /**
+     * Roll-back the operations
+     * <p/>
+     * @throws SQLException
+     */
     public static void rollback() throws SQLException
     {
         conn.rollback();
