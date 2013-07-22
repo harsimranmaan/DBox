@@ -29,10 +29,7 @@ class InteractionManager
     private ConfigManager config;
 
     /**
-     * Handles Interaction with the User
-     * <p/>
-     * <
-     * p/>
+     * User interaction initialization
      */
     public InteractionManager(IAuthentication auth, ConfigManager config)
     {
@@ -140,7 +137,8 @@ class InteractionManager
     /**
      * Checks the existence of the folder
      * <p/>
-     * @param path <p/>
+     * @param path of the user directory
+     * <p/>
      * @return folder existence in boolean format
      */
     private boolean folderExists(String path)
@@ -180,7 +178,7 @@ class InteractionManager
     }
 
     /**
-     * Initializes the Interaction
+     * The function to initialize the further interaction after authentication
      * <p/>
      * @throws RemoteException
      */
@@ -274,7 +272,7 @@ class InteractionManager
     }
 
     /**
-     * Print command options
+     * Command help to the user
      */
     public void printPrompt()
     {

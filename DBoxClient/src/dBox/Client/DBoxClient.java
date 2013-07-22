@@ -51,7 +51,7 @@ public class DBoxClient
             Registry registry = LocateRegistry.getRegistry(server, port);
             IAuthentication auth = (IAuthentication) registry.lookup(IAuthentication.class.getSimpleName());
             InteractionManager interact = new InteractionManager(auth, context);
-            //Start
+            //Starting the interaction
             interact.init();
         }
         catch (RemoteException ex)

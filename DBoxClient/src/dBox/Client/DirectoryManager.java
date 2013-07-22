@@ -174,12 +174,26 @@ public class DirectoryManager extends Thread
         FileDeleter.delete(path, this.folder);
     }
 
+    /**
+     * The function invoke the upload procedure
+     * <p/>
+     * @param path file which is to be uploaded
+     * <p/>
+     * @return hash of the file
+     */
     private String upload(Path path)
     {
         new FileSender(receiver, getServerPath(path), path).sendFile();
         return Hashing.getSHAChecksum(path.toString());
     }
 
+    /**
+     * The function to resolve the conflict files
+     * <p/>
+     * @param path conflicted path
+     * <p/>
+     * @return new path of the conflicted file
+     */
     private String resolveConflict(Path path)
     {
         File old = new File(path.toString());
@@ -190,6 +204,13 @@ public class DirectoryManager extends Thread
         return newPath;
     }
 
+    /**
+     * The function to create conflict file path
+     * <p/>
+     * @param path of the file which has conflicted
+     * <p/>
+     * @return conflict file path
+     */
     private String getRenamePath(Path path)
     {
         return path.toString().replaceAll(path.getFileName() + "$", "~CONFLICT_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + path.getFileName());
@@ -235,9 +256,11 @@ public class DirectoryManager extends Thread
     }
 
     /**
-     *
-     * @param child <p/>
-     * @return
+     * The function to get the path of the server
+     * <p/>
+     * @param child the path of the server directory
+     * <p/>
+     * @return server path in String format
      */
     private String getServerPathFull(Path child)
     {
@@ -273,6 +296,11 @@ public class DirectoryManager extends Thread
         return receiver;
     }
 
+    /**
+     * The function to touch all the files in the user given directory path
+     * <p/>
+     * @param path give by the user
+     */
     private void touchAllFiles(Path path)
     {
 

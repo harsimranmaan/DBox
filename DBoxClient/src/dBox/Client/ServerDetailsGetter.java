@@ -9,7 +9,7 @@ import dBox.IServerDetailsGetter;
 import dBox.ServerDetails;
 
 /**
- * gives the server detail to the client upon request
+ * gives the server details to the client upon request
  * <p/>
  * @author harsimran.maan
  */
@@ -29,7 +29,7 @@ public class ServerDetailsGetter implements IServerDetailsGetter
     }
 
     /**
-     * gives server detail for the authentic user
+     * gives server detail to the user
      * <p/>
      * @return server details
      * <p/>
