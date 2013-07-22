@@ -22,7 +22,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class to authenticate the user and get the server details
+ * <p/>
  * @author harsimran.maan
  */
 public class Authenticator extends UnicastRemoteObject implements IAuthentication, Serializable
@@ -43,6 +44,15 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         this.config = config;
     }
 
+    /**
+     * The function to authenticate the client with user name and password
+     * <p/>
+     * @param userName
+     * @param password <p/>
+     * @return the client details
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public ClientDetails authenticate(String userName, String password) throws RemoteException
     {
@@ -76,6 +86,14 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         }
     }
 
+    /**
+     * The function to authenticate the client with the hash
+     * <p/>
+     * @param hash <p/>
+     * @return the client details
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public ClientDetails authenticate(String hash) throws RemoteException
     {
@@ -108,6 +126,14 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
         }
     }
 
+    /**
+     * The function to get the server details
+     * <p/>
+     * @param clusterId <p/>
+     * @return the server details
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public ServerDetails getServerDetails(int clusterId) throws RemoteException
     {
@@ -119,6 +145,14 @@ public class Authenticator extends UnicastRemoteObject implements IAuthenticatio
 
     }
 
+    /**
+     * The synchronized function to get the primary server in the cluster
+     * <p/>
+     * @param defaultServer
+     * @param port
+     * @param clusterId <p/>
+     * @return the primary server details
+     */
     private synchronized ServerDetails getPrimaryServer(String defaultServer, int port, int clusterId)
     {
         ServerDetails sDetails = new ServerDetails(defaultServer, port, clusterId, 0);

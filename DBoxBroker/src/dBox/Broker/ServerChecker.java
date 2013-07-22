@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 
 /**
- *
+ * The class to check the server and monitor server and add maintain hash map
+ * <p/>
  * @author harsimran.maan
  */
 public class ServerChecker extends UnicastRemoteObject implements IServerChecker, Serializable
@@ -25,7 +26,8 @@ public class ServerChecker extends UnicastRemoteObject implements IServerChecker
     private HashMap<String, ServerDetails> serverDetails;
 
     /**
-     *
+     * The function to check the server state
+     * <p/>
      * @throws RemoteException
      */
     public ServerChecker() throws RemoteException
@@ -34,6 +36,13 @@ public class ServerChecker extends UnicastRemoteObject implements IServerChecker
         this.serverDetails = new HashMap<>();
     }
 
+    /**
+     * The function to ping the server
+     * <p/>
+     * @param server
+     * @param port
+     * @param clusterId
+     */
     public synchronized void pingServer(String server, int port, int clusterId)
     {
         if (getServerDetails().containsKey(server))
@@ -47,6 +56,13 @@ public class ServerChecker extends UnicastRemoteObject implements IServerChecker
         }
     }
 
+    /**
+     * The function to add the server detail to the hash map
+     * <p/>
+     * @param servername
+     * @param port
+     * @param clusterId
+     */
     private void add(String servername, int port, int clusterId)
     {
         ArrayList<Integer> list = new ArrayList<>();
@@ -62,6 +78,14 @@ public class ServerChecker extends UnicastRemoteObject implements IServerChecker
 
     }
 
+    /**
+     * The override function to ping the server
+     * <p/>
+     * @param server
+     * @param port
+     * @param clusterId <p/>
+     * @throws RemoteException
+     */
     @Override
     public void ping(String server, int port, int clusterId) throws RemoteException
     {
@@ -85,12 +109,30 @@ public class ServerChecker extends UnicastRemoteObject implements IServerChecker
         this.serverDetails = serverDetails;
     }
 
+    /**
+     * The function to monitor the server
+     * <p/>
+     * @param server
+     * @param clusterId <p/>
+     * @return server detail
+     * <p/>
+     * @throws RemoteException
+     */
     @Override
     public ServerDetails getMonitor(String server, int clusterId) throws RemoteException
     {
         return tryGetMonitor(server, clusterId);
     }
 
+    /**
+     * The synchronized function to get the monitor server
+     * <p/>
+     * @param server
+     * @param clusterId <p/>
+     * @return monitor server
+     * <p/>
+     * @throws RemoteException
+     */
     private synchronized ServerDetails tryGetMonitor(String server, int clusterId) throws RemoteException
     {
         int myServerIndex = serverDetails.get(server).getServerIndex();

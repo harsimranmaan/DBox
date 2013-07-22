@@ -13,7 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * The Class to monitor the servers
+ * <p/>
  * @author harsimran.maan
  */
 public class FileServerMonitor extends Thread
@@ -22,12 +23,21 @@ public class FileServerMonitor extends Thread
     private final ServerChecker checker;
     private final ConfigManager config;
 
+    /**
+     * Initiates the class property
+     * <p/>
+     * @param checker
+     * @param config
+     */
     public FileServerMonitor(ServerChecker checker, ConfigManager config)
     {
         this.checker = checker;
         this.config = config;
     }
 
+    /**
+     * Thread to start monitoring the file server in the cluster
+     */
     @Override
     public void run()
     {
