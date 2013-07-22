@@ -7,7 +7,7 @@ package dBox;
 import java.io.Serializable;
 
 /**
- * File details
+ * Interface for the File details
  * <p/>
  * @author Kuntal
  */
@@ -17,6 +17,12 @@ public class FileDetail implements Serializable
     private String oldHash;
     private String fileHash;
 
+    /**
+     * setting up the old and new hash of the file
+     * <p/>
+     * @param oldHash
+     * @param newHash
+     */
     public FileDetail(String oldHash, String newHash)
     {
         this.oldHash = oldHash;

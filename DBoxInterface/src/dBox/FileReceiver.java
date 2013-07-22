@@ -14,7 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Class to represent the receiving object
+ * <p/>
  * @author harsimran.maan
  */
 public class FileReceiver
@@ -23,6 +24,11 @@ public class FileReceiver
 
     private String directory;
 
+    /**
+     * Initiates directory path and create the directory
+     * <p/>
+     * @param directory in which the packet is to be received
+     */
     public FileReceiver(String directory)
     {
         CustomLogger.log("FileReceiver > FileReceiver : directory " + directory);
@@ -31,6 +37,14 @@ public class FileReceiver
         theFile.mkdirs();
     }
 
+    /**
+     * The function to receive the file packet to the given file path
+     * <p/>
+     * @param path
+     * @param packet
+     * <p/>
+     * @throws RemoteException
+     */
     public void receiveFile(String path, FilePacket packet) throws RemoteException
     {
         try

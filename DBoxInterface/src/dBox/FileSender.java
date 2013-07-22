@@ -22,6 +22,13 @@ public class FileSender extends Thread
     private Path clientFile;
     private IFileServer receiver;
 
+    /**
+     * Initiates the FileSender properties
+     * <p/>
+     * @param receiver
+     * @param serverPath
+     * @param clientPath
+     */
     public FileSender(IFileServer receiver, String serverPath, Path clientPath)
     {
         CustomLogger.log("FileSender > FileSender : serverPath " + serverPath + " clientPath " + clientPath.toString());
@@ -30,11 +37,17 @@ public class FileSender extends Thread
         this.receiver = receiver;
     }
 
+    /**
+     * Thread starts
+     */
     public void run()
     {
         this.sendFile();
     }
 
+    /**
+     * The function to send a file
+     */
     public void sendFile()
     {
         try

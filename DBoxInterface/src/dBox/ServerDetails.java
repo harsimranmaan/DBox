@@ -53,11 +53,20 @@ public class ServerDetails implements Serializable
         return port;
     }
 
+    /**
+     * The function to set the ping time
+     */
     public void ping()
     {
         this.pingTime = new Date();
     }
 
+    /**
+     * The function is to check the timeout
+     * <p/>
+     * @param timeout <p/>
+     * @return the time out value
+     */
     public boolean isTimedOut(int timeout)
     {
         return new Date().getTime() - pingTime.getTime() > timeout;

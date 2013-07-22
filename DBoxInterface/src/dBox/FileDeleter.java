@@ -18,7 +18,7 @@ public class FileDeleter
 {
 
     /**
-     * Recursively delete empty directory
+     * Interface to delete the parent directory
      * <p/>
      * @param path
      * @param upto <p/>

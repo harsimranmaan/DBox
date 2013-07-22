@@ -37,7 +37,8 @@ public class HashManager
     private String hashFilePath;
 
     /**
-     *
+     * Instantiates the Hash Manager attributes
+     * <p/>
      * @param filePath
      * @param fileEvent
      */
@@ -132,6 +133,11 @@ public class HashManager
         writeHashes();
     }
 
+    /**
+     * The function to delete the entry from the hash-map
+     * <p/>
+     * @param key
+     */
     public void deleteHash(Path key)
     {
         lastKnownServerHashes.remove(key.toString());
@@ -146,6 +152,13 @@ public class HashManager
         return hashFilePath;
     }
 
+    /**
+     * The function to get the detail of the deleted file
+     * <p/>
+     * @param currentFileHashes
+     * <p/>
+     * @return the hash-map of the deleted file
+     */
     public HashMap<String, FileDetail> getDeletedFiles(HashMap<String, FileDetail> currentFileHashes)
     {
         HashMap<String, FileDetail> deleted = new HashMap<>();

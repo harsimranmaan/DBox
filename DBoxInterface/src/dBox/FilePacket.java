@@ -81,22 +81,4 @@ public class FilePacket implements Serializable
         }
 
     }
-//    /**
-//     * Have the file packet recreate itself, used after sending it to another
-//     * location file will have same name and contents
-//     * <p/>
-//     * @param out The outputStream to write itself to
-//     * <p/>
-//     */
-//    public void writeTo(OutputStream out)
-//    {
-////        try
-////        {
-////            out.write(data);
-////        }
-////        catch (Exception e)
-////        {
-////            e.printStackTrace();
-////        }
-//    }
 }

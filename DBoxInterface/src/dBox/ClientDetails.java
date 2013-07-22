@@ -7,7 +7,7 @@ package dBox;
 import java.io.Serializable;
 
 /**
- * Client detail interface
+ * Interface for the Client details
  * <p/>
  * @author harsimran.maan
  */
@@ -20,6 +20,14 @@ public class ClientDetails implements Serializable
     private int quota;
     private int clusterId;
 
+    /**
+     * Setting up the client details
+     * <p/>
+     * @param username
+     * @param hash
+     * @param quota
+     * @param clusterId
+     */
     public ClientDetails(String username, String hash, int quota, int clusterId)
     {
         this.username = username;
